@@ -2,7 +2,7 @@ Our team is creating a room mapping robot. The purpose of the robot is to autono
 
 Our proposed design will include a raspberry pi as a system controller to implement overarching algorithms and data manipulation in a high-level language such as Python.  We will also use an LPC1768 MBED board as a microcontroller for motor control and data acquisition.  2 – 4 DC motors will be needed to drive wheel rotation and at least one LIDAR sensor to measure distances to close objects.  A servo motor will be considered for movement of the LIDAR sensor.
 
-Related projects (URLs) and describe how your project will be different or improved.
+Related projects (URLs) and describe how your project will be different or improved:
 
 https://os.mbed.com/users/swebster9/notebook/multiple-scanning-lidar-robot/#
 
