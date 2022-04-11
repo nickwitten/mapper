@@ -2,7 +2,7 @@
 
 This is a final team based project for Georgia Tech ECE4180 Embedded System Design Course.
 
-Team Member Names:
+Team Members:
 
     Juntao Wang: jwang3046@gatech.edu
     Sicheng Zou: Sicheng.zou@gatech.edu
