@@ -9,8 +9,11 @@ Our proposed design will include a raspberry pi as a system controller to implem
 List any closely related projects (URLs) and describe how your project will be different or improved.
 
 https://os.mbed.com/users/swebster9/notebook/multiple-scanning-lidar-robot/#
+
 https://os.mbed.com/users/abh15/notebook/robotic-cartographer/
+
 https://os.mbed.com/users/arogliero3/notebook/semi-autonomous-robot---ece-4180/#
+
 https://os.mbed.com/users/boyanmirov/code/RobotControlviaBluetooth/wiki/Homepage
 
 Our project will be built on a similar robot platform listed above. However, we will be focusing more on the process of 2D mapping. We want our robot to be able to detect objects around it and process the data get from sensor to generate a 2D map stored in the SD card(maybe). We might want to use multiple sensors so that the detection  process is more accurate. Like the project above about the cartographer, we want to build something similar but with more functions and easier to control.
