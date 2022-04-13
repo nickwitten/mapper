@@ -22,3 +22,10 @@ Schematic:
 Source Codes:
 
 Photos/Videos:
+
+
+Lowest EndGoal:
+
+To make the robot walk straight along a wall and measure the distance between the robot and the wall
+
+Solve a simple maze and walk through one path.
