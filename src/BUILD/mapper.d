@@ -1,4 +1,4 @@
-main.o: ../main.cpp ../mbed_config.h ../mbed/mbed.h \
+mapper.o: ../mapper.cpp ../mbed_config.h ../mapper.h ../mbed/mbed.h \
  ../mbed-rtos/rtos/rtos.h ../mbed-rtos/rtos/Thread.h \
  ../mbed-rtos/rtx/TARGET_CORTEX_M/cmsis_os.h ../mbed/Callback.h \
  ../mbed/toolchain.h ../mbed-rtos/rtos/Semaphore.h \
@@ -39,7 +39,7 @@ main.o: ../main.cpp ../mbed_config.h ../mbed/mbed.h \
  ../mbed/LocalFileSystem.h ../mbed/FileSystemLike.h ../mbed/DirHandle.h \
  ../mbed/InterruptIn.h ../mbed/gpio_irq_api.h ../mbed/wait_api.h \
  ../mbed/sleep_api.h ../mbed/rtc_time.h ../mbed/FunctionPointer.h \
- ../mapper.h ../X_NUCLEO_53L0A1/XNucleo53L0A1.h \
+ ../X_NUCLEO_53L0A1/XNucleo53L0A1.h \
  ../X_NUCLEO_53L0A1/Components/VL53L0X/VL53L0X.h \
  ../X_NUCLEO_53L0A1/ST_INTERFACES/Sensors/RangeSensor.h \
  ../X_NUCLEO_53L0A1/ST_INTERFACES/Common/Component.h \

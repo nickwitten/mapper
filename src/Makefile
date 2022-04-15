@@ -64,6 +64,7 @@ OBJECTS += SDFileSystem/FATFileSystem/FATFileHandle.o
 OBJECTS += SDFileSystem/FATFileSystem/FATFileSystem.o
 OBJECTS += SDFileSystem/SDFileSystem.o
 OBJECTS += main.o
+OBJECTS += mapper.o
 OBJECTS += mbed-rtos/rtos/Mutex.o
 OBJECTS += mbed-rtos/rtos/RtosTimer.o
 OBJECTS += mbed-rtos/rtos/Semaphore.o
