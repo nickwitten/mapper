@@ -1,10 +1,10 @@
 #include "mapper.h"
 
 Mapper::Mapper():
-        _i2c(I2C_SDA_PIN, I2C_SCL_PIN),
-        _lidar_shdn_0(LIDAR_SHDN_0),
-        _lidar_shdn_1(LIDAR_SHDN_1),
-        _lidar_shdn_2(LIDAR_SHDN_2)
+_i2c(I2C_SDA_PIN, I2C_SCL_PIN),
+_lidar_shdn_0(LIDAR_SHDN_0),
+_lidar_shdn_1(LIDAR_SHDN_1),
+_lidar_shdn_2(LIDAR_SHDN_2)
 {
     _init_lidar();
 }

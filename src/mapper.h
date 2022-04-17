@@ -1,6 +1,5 @@
 #include "mbed.h"
 #include "XNucleo53L0A1.h"
-#include <stdio.h>
 
 #define I2C_SDA_PIN p28
 #define I2C_SCL_PIN p27
@@ -14,7 +13,8 @@ public:
     Mapper();
     ~Mapper();
     uint32_t read_center_dist();
-
+    int32_t x = 0;  // X coordinate relative to start
+    int32_t y = 0;  // Y coordinate relative to start
 private:
     DevI2C _i2c;
     DigitalOut _lidar_shdn_0;
