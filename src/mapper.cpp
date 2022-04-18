@@ -1,9 +1,16 @@
 #include "mapper.h"
 #include "VL53L0X.h"
 #include "mbed.h"
+#include "HALLFX_ENCODER.h"
 
+
+// Serial pc(USBTX, USBRX);
 
 Mapper::Mapper():
+_wheel_l(MOTOR_PWM_LEFT, MOTOR_FWD_LEFT, MOTOR_REV_LEFT),
+_wheel_r(MOTOR_PWM_RIGHT, MOTOR_FWD_RIGHT, MOTOR_REV_RIGHT),
+_encoder_left(ENCODER_LEFT_PIN),
+_encoder_right(ENCODER_RIGHT_PIN),
 _i2c(I2C_SDA_PIN, I2C_SCL_PIN),
 _lidar_shdn_center(LIDAR_SHDN_CENTER),
 _lidar_shdn_left(LIDAR_SHDN_LEFT),
@@ -16,6 +23,36 @@ Mapper::~Mapper() {
     delete _lidars.center;
     delete _lidars.left;
     delete _lidars.right;
+}
+
+int Mapper::drive(float speed) {
+    _wheel_l.speed(speed);
+    _wheel_r.speed(speed);
+    return 0;
+}
+
+bool Mapper::check_moved_distance(uint32_t dist) {
+    int lr = _encoder_left.read();
+    int rr = _encoder_right.read();
+    float ld = 0.5672320068 * (lr); //unit in mm
+    float rd = 0.5672320068 * (rr);
+    float total_d = (ld + rd) / 2;
+    x = 0;
+    y = total_d;
+    return y >= dist - 45;
+}
+
+
+int Mapper::move_forward(uint32_t dist) {
+    //pc.printf("total_d: %f\n\r",total_d);
+    _encoder_left.reset();
+    _encoder_right.reset();
+    _wheel_l.speed(0.3);
+    _wheel_r.speed(0.3);
+    while (!check_moved_distance(dist));
+    _wheel_l.speed(0);
+    _wheel_r.speed(0);
+    return 0;
 }
 
 

@@ -1,30 +1,27 @@
 #include "mbed.h"
 #include "mapper.h"
-#include <list>
+#include "rtos.h"
 
 
 Serial pc(USBTX, USBRX);
-std::list<point> points;
+Mapper robot;
 
-int main() {
-    Mapper robot;
-    Point measured_point = {0, 0};
-    LIDAR_DIRECTION dirs[3] = {CENTER, LEFT, RIGHT};
-    while (1) {
+
+void plot_surrounding() {
+    while(1) {
+        Point measured_point = {0, 0};
+        LIDAR_DIRECTION dirs[3] = {CENTER, LEFT, RIGHT};
         for (auto dir : dirs) {
             if (!robot.plot_object(dir, measured_point)) {
-                points.push_back(measured_point);  // Make sure this makes a copy
-                pc.printf("Coordinate added: %ld, %ld\r\n", points.back().x, points.back().y);
+                pc.printf("[%ld, %ld],\r\n", measured_point.x, measured_point.y);
             }
         }
-        // pc.printf("List size: %u\r\n", points.size());
-
-        // SIMULATE SPIN
-//         int status = robot.plot_object(LEFT, measured_point);
-//         if (!status) {
-//             pc.printf("Coordinate: %ld, %ld\r\n", measured_point.x, measured_point.y);
-//             robot.theta += M_PI / 180 * 10;
-//             wait(0.5);
-//         }
+        Thread::wait(10);
     }
+}
+
+int main() {
+    Thread t(&plot_surrounding);
+    robot.move_forward(1000);
+    t.terminate();
 }

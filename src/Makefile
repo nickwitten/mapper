@@ -91,6 +91,7 @@ OBJECTS += mbed-rtos/rtx/TARGET_CORTEX_M/rt_Timer.o
 OBJECTS += wave_player/wave_player.o
 OBJECTS += X_NUCLEO_53L0A1/Components/VL53L0X/VL53L0X.o
 OBJECTS += X_NUCLEO_53L0A1/XNucleo53L0A1.o
+OBJECTS += HALLFX_ENCODER.o
 
 
  SYS_OBJECTS += mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o
