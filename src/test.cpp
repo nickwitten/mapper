@@ -1,6 +1,8 @@
 #include "mbed.h"
 #include "Motor.h"
 #include "HALLFX_ENCODER.h"
+#include "mapper.h"
+
 Motor ml(p22, p7, p8); // pwm, fwd, rev
 Motor mr(p21, p5, p6);
 DigitalOut led1(LED1);
@@ -9,6 +11,7 @@ HALLFX_ENCODER left_encoder(p10);
 HALLFX_ENCODER right_encoder(p9);
 
 
+int dist = 0;
 int old_L = 0;
 int old_R = 0;
 void initialize_movement() {
@@ -70,7 +73,18 @@ bool move_forward(float dist) {
     return true;
 }
 int main() {
-
+    /*Mapper robot;
+    float angle = 0.0;
+    dist = robot.read_dist(CENTER);
+    if (dist<5）{
+        angle = 90.0;
+        while (turn_angle(angle)) {
+            ml.speed(0.3);
+            mr.speed(-0.3);
+        }
+    }
+    move_straight();
+    */
     //move1
     initialize_movement();
     while (move_forward(20.0)) {
