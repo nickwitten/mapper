@@ -19,14 +19,21 @@ typedef struct lidars {
     VL53L0X *right;
 } lidars;
 
+typedef struct point {
+        int32_t x;
+        int32_t y;
+} Point;
+
 
 class Mapper {
 public:
     Mapper();
     ~Mapper();
-    uint32_t read_dist(LIDAR_DIRECTION dir);
-    int32_t x = 0;  // X coordinate relative to start
-    int32_t y = 0;  // Y coordinate relative to start
+    int plot_object(LIDAR_DIRECTION dir, Point &p);
+    int read_dist(LIDAR_DIRECTION dir, uint32_t &dist);
+    int32_t x = 0;  // X coordinate relative to start in millimiters
+    int32_t y = 0;  // Y coordinate relative to start in millimiters
+    float theta = M_PI / 2;  // Orientation of robot in radians
 private:
     DevI2C _i2c;
     DigitalOut _lidar_shdn_center;
@@ -34,4 +41,5 @@ private:
     DigitalOut _lidar_shdn_right;
     lidars _lidars;
     void _init_lidar();
+    uint32_t _map_thresh_mm = 500;  // Objects must be this close to be mapped
 };

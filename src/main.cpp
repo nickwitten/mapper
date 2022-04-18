@@ -4,24 +4,27 @@
 
 
 Serial pc(USBTX, USBRX);
-typedef struct point {
-    int32_t x;
-    int32_t y;
-} point;
 std::list<point> points;
 
 int main() {
     Mapper robot;
-    point measured_point;
+    Point measured_point = {0, 0};
+    LIDAR_DIRECTION dirs[3] = {CENTER, LEFT, RIGHT};
     while (1) {
-        auto dist = robot.read_dist(RIGHT);
-        if (dist <= 500) {
-            measured_point.x = robot.x;
-            measured_point.y = robot.y + dist;
-            points.push_back(measured_point);
-            pc.printf("Coordinate added: %ld, %ld\r\n", points.back().x, points.back().y);
+        for (auto dir : dirs) {
+            if (!robot.plot_object(dir, measured_point)) {
+                points.push_back(measured_point);  // Make sure this makes a copy
+                pc.printf("Coordinate added: %ld, %ld\r\n", points.back().x, points.back().y);
+            }
         }
-        pc.printf("List size: %u\r\n", points.size());
-        // wait(1);
+        // pc.printf("List size: %u\r\n", points.size());
+
+        // SIMULATE SPIN
+//         int status = robot.plot_object(LEFT, measured_point);
+//         if (!status) {
+//             pc.printf("Coordinate: %ld, %ld\r\n", measured_point.x, measured_point.y);
+//             robot.theta += M_PI / 180 * 10;
+//             wait(0.5);
+//         }
     }
 }
