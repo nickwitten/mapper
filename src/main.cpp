@@ -14,7 +14,7 @@ int main() {
     Mapper robot;
     point measured_point;
     while (1) {
-        auto dist = robot.read_center_dist();
+        auto dist = robot.read_dist(RIGHT);
         if (dist <= 500) {
             measured_point.x = robot.x;
             measured_point.y = robot.y + dist;
