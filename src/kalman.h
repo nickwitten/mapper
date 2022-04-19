@@ -3,7 +3,7 @@
 #include "rtos.h"
 
 
-Serial pc(USBTX, USBRX);
+// Serial pc(USBTX, USBRX);
 Mapper robot;
 
 
@@ -25,10 +25,10 @@ int main() {
     Ticker update_poll;
     Ticker speed_poll;
     update_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::update_position, 0.25);
-    speed_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::move_straight, 0.01);
-    robot.drive(0.6);
+    speed_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::move_straight, 0.001);
+    robot.drive(0.3);
     while (1) {
-        pc.printf("X: %d\r\nY: %d\r\nTHETA: %.1f\r\n\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI);
+        // pc.printf("X: %d\r\nY: %d\r\nTHETA: %.1f\r\n\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI);
         wait(0.5);
     }
 }

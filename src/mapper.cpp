@@ -1,7 +1,7 @@
 #include "mapper.h"
 
 
-// Serial pc(USBTX, USBRX);
+Serial pc(USBTX, USBRX);
 
 Mapper::Mapper():
 _wheel_l(MOTOR_PWM_LEFT, MOTOR_FWD_LEFT, MOTOR_REV_LEFT),
@@ -47,20 +47,22 @@ void Mapper::move_straight() {
     static uint16_t last_enc_count_r = 0;
     uint16_t count_l = _encoder_left.read();
     uint16_t count_r = _encoder_right.read();
-    float dist_l = 0.5672320068 * count_l;  // unit in mm
-    float dist_r = 0.5672320068 * count_r;
+    float dist_l = 0.5672320068 * (count_l - last_enc_count_l);  // unit in mm
+    float dist_r = 0.5672320068 * (count_r - last_enc_count_r);
     last_enc_count_l = count_l;
     last_enc_count_r = count_r;
     if (dist_l < 0 || dist_r < 0) return;  // If encoder was reset
     if (dist_l > dist_r) {
         // need turn left
-        _wheel_r.speed(_speed + 0.1);
+        _wheel_r.speed(_speed + 0.05);
         _wheel_l.speed(_speed);
+        pc.printf("Turn left\r\n");
     }
     else if (dist_l < dist_r) {
         // need to turn right
         _wheel_r.speed(_speed);
-        _wheel_l.speed(_speed + 0.1);
+        _wheel_l.speed(_speed + 0.05);
+        pc.printf("Turn right\r\n");
     }
 }
 
