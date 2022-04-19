@@ -3,8 +3,8 @@
 #include "VL53L0X.h"
 #include "HALLFX_ENCODER.h"
 
-#define MOTOR_PWM_LEFT p21
-#define MOTOR_PWM_RIGHT p22
+#define MOTOR_PWM_LEFT p22
+#define MOTOR_PWM_RIGHT p21
 #define MOTOR_FWD_LEFT p6
 #define MOTOR_FWD_RIGHT p7
 #define MOTOR_REV_LEFT p5

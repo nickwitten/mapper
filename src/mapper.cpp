@@ -57,7 +57,7 @@ void Mapper::move_straight() {
     if (dist_l > dist_r) {
         // need turn left
         turn_r_n = 0;
-        _wheel_r.speed(_speed + 0.05 * ++turn_l_n);
+        _wheel_r.speed(_speed + 0.05 + 0.01 * ++turn_l_n);
         _wheel_l.speed(_speed);
         pc.printf("Turn left\r\n");
     }
@@ -65,7 +65,7 @@ void Mapper::move_straight() {
         // need to turn right
         turn_l_n = 0;
         _wheel_r.speed(_speed);
-        _wheel_l.speed(_speed + 0.05 * ++turn_r_n);
+        _wheel_l.speed(_speed + 0.05 + 0.01 * ++turn_r_n);
         pc.printf("Turn right\r\n");
     }
 }
