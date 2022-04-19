@@ -31,21 +31,21 @@ Part List:
     
 Schematic:
 
-Motor Drivers and Dual Motors:
-Mbed LPC1768   Motor Driver   Motor_Left  Motor_Right
-VOUT           VCC
-GND            GND
-               VM (to Power)
-               A01            RED
-               A02            BLACK
-               B01                        RED
-               B02                        BLACK
-p21            PWMA
-p22            PMWB
-p6             AI1
-p7             BI1
-p5             AI2
-p8             BI2
+    Motor Drivers and Dual Motors:
+    Mbed LPC1768   Motor Driver   Motor_Left  Motor_Right
+    VOUT           VCC
+    GND            GND
+                   VM (to Power)
+                   A01            RED
+                   A02            BLACK
+                   B01                        RED
+                   B02                        BLACK
+    p21            PWMA
+    p22            PMWB
+    p6             AI1
+    p7             BI1
+    p5             AI2
+    p8             BI2
 
 LIDAR Sensors:
 
