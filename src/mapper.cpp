@@ -1,7 +1,4 @@
 #include "mapper.h"
-#include "VL53L0X.h"
-#include "mbed.h"
-#include "HALLFX_ENCODER.h"
 
 
 // Serial pc(USBTX, USBRX);
@@ -16,6 +13,8 @@ _lidar_shdn_center(LIDAR_SHDN_CENTER),
 _lidar_shdn_left(LIDAR_SHDN_LEFT),
 _lidar_shdn_right(LIDAR_SHDN_RIGHT)
 {
+    _encoder_left.reset();
+    _encoder_right.reset();
     _init_lidar();
 }
 
@@ -55,6 +54,59 @@ int Mapper::move_forward(uint32_t dist) {
     return 0;
 }
 
+void Mapper::update_position() {
+    // State will be inacurate if any negative speeds are used!
+    Measurement m = get_measurements();
+    State nx;
+    nx.theta = state.theta + (_dt * m.rv - _dt * m.lv) / _wheel_sep;
+    nx.x = state.x + (0.5 * _dt * m.lv + 0.5 * _dt * m.rv) * cos(nx.theta);
+    nx.y = state.y + (0.5 * _dt * m.lv + 0.5 * _dt * m.rv) * sin(nx.theta);
+    nx.lv = m.lv;
+    nx.rv = m.rv;
+    state = nx;
+    // // x' = f(x)
+    // State x_pred = fx(state, _dt);
+    // // z' = z - h(x)
+    // Measurement z_pred = hx(x_pred);
+    // Measurement z = get_measurements();
+    // Measurement residual;
+    // residual.lv = z.lv - z_pred.lv;
+    // residual.rv = z.rv - z_pred.rv;
+    // residual.theta = z.theta - z_pred.theta;
+    // // 
+    // state = 
+}
+
+Measurement Mapper::get_measurements() {
+    Measurement z;
+    int lr = _encoder_left.read();
+    int rr = _encoder_right.read();
+    float ld = 0.5672320068 * (lr); //unit in mm
+    float rd = 0.5672320068 * (rr);
+    z.lv = ld / _dt;
+    z.rv = rd / _dt;
+    _encoder_left.reset();
+    _encoder_right.reset();
+    return z;
+}
+
+State Mapper::fx(State _x) {
+    State nx;
+    nx.x += (0.5 * _dt * state.lv + 0.5 * _dt * state.rv) * cos(state.theta);
+    nx.y += (0.5 * _dt * state.lv + 0.5 * _dt * state.rv) * sin(state.theta);
+    nx.lv = state.lv;
+    nx.rv = state.rv;
+    nx.theta += (_dt * state.rv - _dt * state.lv) / _wheel_sep;
+    return nx;
+}
+
+Measurement Mapper::hx(State _x) {
+    Measurement m;
+    m.lv = _x.lv;
+    m.rv = _x.rv;
+    m.theta = _x.theta;
+    return m;
+}
 
 // Returns 0 on map of object
 // Returns -1 on fail to map an object

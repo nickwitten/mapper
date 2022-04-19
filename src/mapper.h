@@ -34,6 +34,20 @@ typedef struct point {
         int32_t y;
 } Point;
 
+typedef struct state {
+    int32_t x = 0;
+    int32_t y = 0;
+    int32_t lv = 0;
+    int32_t rv = 0;
+    float theta = M_PI / 2;
+} State;
+
+typedef struct measurement {
+    int32_t lv;
+    int32_t rv;
+    int32_t theta;
+} Measurement;
+
 
 class Mapper {
 public:
@@ -42,14 +56,19 @@ public:
     int drive(float speed);
     bool check_moved_distance(uint32_t dist);
     int move_forward(uint32_t dist);
+    void update_position();
+    Measurement get_measurements();
+    State fx(State _x);
+    Measurement hx(State _x);
     int plot_object(LIDAR_DIRECTION dir, Point &p);
     int read_dist(LIDAR_DIRECTION dir, uint32_t &dist);
     int32_t x = 0;  // X coordinate relative to start in millimiters
     int32_t y = 0;  // Y coordinate relative to start in millimiters
     float theta = M_PI / 2;  // Orientation of robot in radians
+    State state;
 private:
-    uint32_t old_L = 0;
-    uint32_t old_R = 0;
+    float _dt = 0.25;  // Time change between updates in seconds
+    uint32_t _wheel_sep = 150;  // Separation between center of wheels in mm
     Motor _wheel_l;
     Motor _wheel_r;
     HALLFX_ENCODER _encoder_left;
