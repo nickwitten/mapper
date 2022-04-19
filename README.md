@@ -30,6 +30,7 @@ Part List:
     Raspberry Pi Zero W (https://www.sparkfun.com/products/14277)
     
 Schematic:
+
 Motor Drivers and Dual Motors:
 
     Mbed LPC1768   Motor Driver   Motor_Left  Motor_Right
