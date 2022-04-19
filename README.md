@@ -49,22 +49,22 @@ Schematic:
 
 LIDAR Sensors:
 
-Mbed LPC1768   LIDAR_Right   LIDAR_Left   LIDAR_Center
-VOUT           VIN           VIN          VIN
-GND            GND           GND          GND
-p28            SDA           SDA          SDA
-p27            SCL           SCL          SCL
-p24            SHDN      
-p25                          SHDN
-p26                                      SHDN
+    Mbed LPC1768   LIDAR_Right   LIDAR_Left   LIDAR_Center
+    VOUT           VIN           VIN          VIN
+    GND            GND           GND          GND
+    p28            SDA           SDA          SDA
+    p27            SCL           SCL          SCL
+    p24            SHDN      
+    p25                          SHDN
+    p26                                      SHDN
 
 Encoders:
 
-Mbed LPC1768   Encoder_Left   Encoder_Right
-VOUT           RED            RED
-GND            BLACK          BLACK
-p11            WHITE
-p12                           WHITE
+    Mbed LPC1768   Encoder_Left   Encoder_Right
+    VOUT           RED            RED
+    GND            BLACK          BLACK
+    p11            WHITE
+    p12                           WHITE
 
 Source Codes:
 
