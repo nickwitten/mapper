@@ -10,11 +10,11 @@ Team Members:
     
 Overview:
 
-    The project is to create a room mapping robot. The purpose of the robot is to autonomously roam a room and plot the 2D coordinates of walls and obstacles while expanding its knowledge in a frontier-based fashion.
+The project is to create a room mapping robot. The purpose of the robot is to autonomously roam a room and plot the 2D coordinates of walls and obstacles while expanding its knowledge in a frontier-based fashion.
 
 Design Description:
 
-    The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dual H-Bridge driver module are used to maneuver the robot; 3 LIDAR sensors are used to measure distances while the robot is moving. The whole system is based on the Mbed LPC1768 running Mbed RTOS. In addition, a raspberry pi is used for data manipulation in Python. The robot is also able to flash code wirelessly using wireless connection on raspberry pi and communication between raspberry pi and Mbed. 
+The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dual H-Bridge driver module are used to maneuver the robot; 3 LIDAR sensors are used to measure distances while the robot is moving. The whole system is based on the Mbed LPC1768 running Mbed RTOS. In addition, a raspberry pi is used for data manipulation in Python. The robot is also able to flash code wirelessly using wireless connection on raspberry pi and communication between raspberry pi and Mbed. 
 
 Part List:
 
