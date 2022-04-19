@@ -56,6 +56,7 @@ public:
     int drive(float speed);
     bool check_moved_distance(uint32_t dist);
     int move_forward(uint32_t dist);
+    void move_straight();
     void update_position();
     Measurement get_measurements();
     State fx(State _x);
@@ -69,6 +70,7 @@ public:
 private:
     float _dt = 0.25;  // Time change between updates in seconds
     uint32_t _wheel_sep = 150;  // Separation between center of wheels in mm
+    float _speed = 0.3;
     Motor _wheel_l;
     Motor _wheel_r;
     HALLFX_ENCODER _encoder_left;

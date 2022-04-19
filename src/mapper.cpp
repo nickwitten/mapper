@@ -25,6 +25,7 @@ Mapper::~Mapper() {
 }
 
 int Mapper::drive(float speed) {
+    _speed = speed;
     _wheel_l.speed(speed);
     _wheel_r.speed(speed);
     return 0;
@@ -39,6 +40,28 @@ bool Mapper::check_moved_distance(uint32_t dist) {
     x = 0;
     y = total_d;
     return y >= dist - 45;
+}
+
+void Mapper::move_straight() {
+    static uint16_t last_enc_count_l = 0;
+    static uint16_t last_enc_count_r = 0;
+    uint16_t count_l = _encoder_left.read();
+    uint16_t count_r = _encoder_right.read();
+    float dist_l = 0.5672320068 * count_l;  // unit in mm
+    float dist_r = 0.5672320068 * count_r;
+    last_enc_count_l = count_l;
+    last_enc_count_r = count_r;
+    if (dist_l < 0 || dist_r < 0) return;  // If encoder was reset
+    if (dist_l > dist_r) {
+        // need turn left
+        _wheel_r.speed(_speed + 0.1);
+        _wheel_l.speed(_speed);
+    }
+    else if (dist_l < dist_r) {
+        // need to turn right
+        _wheel_r.speed(_speed);
+        _wheel_l.speed(_speed + 0.1);
+    }
 }
 
 

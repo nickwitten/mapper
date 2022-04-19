@@ -22,8 +22,10 @@ Mapper robot;
 
 
 int main() {
-    Ticker update;
-    update.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::update_position, 0.25);
+    Ticker update_poll;
+    Ticker speed_poll;
+    update_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::update_position, 0.25);
+    speed_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::move_straight, 0.01);
     robot.drive(0.6);
     while (1) {
         pc.printf("X: %d\r\nY: %d\r\nTHETA: %.1f\r\n\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI);
