@@ -2,7 +2,7 @@
 BusOut leds(LED1, LED2, LED3, LED4);
 
 
-Serial pc(USBTX, USBRX);
+// Serial pc(USBTX, USBRX);
 
 Mapper::Mapper():
 _wheel_l(MOTOR_PWM_LEFT, MOTOR_FWD_LEFT, MOTOR_REV_LEFT),
@@ -70,15 +70,35 @@ void Mapper::move_straight() {
 }
 
 void Mapper::wheel_speed() {
+    leds = ~leds;
     // Has to be slower or same rate as state update
-    static uint16_t last_lv;
-    static uint16_t last_rv;
+    static uint16_t last_lv = 0;
+    static uint16_t last_rv = 0;
+    float pwm_inc = 0.02;
     // Check if current speed is less than set speed
-    int tolerance = 5;
+    // and check if speed moved in right direction
+    int tolerance = 10;
     if ((state.lv < _speed_mm_l - tolerance) && (state.lv <= last_lv)) {
+        _pwm_l += pwm_inc;
+        _pwm_l = (_pwm_l > 1.0) ? 1.0 : _pwm_l;
+    }
     if ((state.lv > _speed_mm_l + tolerance) && (state.lv >= last_lv)) {
-    if ((state.rv < _speed_mm_r - tolerance) && (state.lv <= last_lv)) {
-    if ((state.rv > _speed_mm_r + tolerance) && (state.lv >= last_lv)) {
+        _pwm_l -= pwm_inc;
+        _pwm_l = (_pwm_l < 0) ? 0 : _pwm_l;
+    }
+    if ((state.rv < _speed_mm_r - tolerance) && (state.rv <= last_rv)) {
+        _pwm_r += pwm_inc;
+        _pwm_r = (_pwm_r > 1.0) ? 1.0 : _pwm_r;
+    }
+    if ((state.rv > _speed_mm_r + tolerance) && (state.rv >= last_rv)) {
+        _pwm_r -= pwm_inc;
+        _pwm_r = (_pwm_r < 0) ? 0 : _pwm_r;
+    }
+    _wheel_l.speed(_pwm_l);
+    _wheel_r.speed(_pwm_r);
+    last_lv = state.lv;
+    last_rv = state.rv;
+}
 
 
 
@@ -86,21 +106,19 @@ void Mapper::orientation() {
     float diff = abs(state.theta - target_theta);
     if (diff > 5 * M_PI / 180) {
         if (state.theta > target_theta) {
-            float new_speed = _speed + (_speed == 0) * 0.35 + 0.2 * (diff / (2*M_PI));
-            _wheel_l.speed(new_speed);
-            _wheel_r.speed(_speed + (_speed == 0) * 0.2);
-            pc.printf("%f\r\n", new_speed);
+            // float new_speed = _speed + (_speed == 0) * 0.35 + 0.2 * (diff / (2*M_PI));
+            // _wheel_l.speed(new_speed);
+            // _wheel_r.speed(_speed + (_speed == 0) * 0.2);
+            _speed_mm_l = _speed_mm + 20;
+            _speed_mm_r = _speed_mm;
         } else {
-            float new_speed = _speed + (_speed == 0) * 0.35 + 0.2 * (diff / (2*M_PI));
-            _wheel_l.speed(_speed + (_speed == 0) * 0.2);
-            _wheel_r.speed(new_speed);
-            pc.printf("%f\r\n", new_speed);
+            _speed_mm_l = _speed_mm;
+            _speed_mm_r = _speed_mm + 20;
         }
     } else {
-        _wheel_l.speed(_speed);
-        _wheel_r.speed(_speed);
+        _speed_mm_l = _speed_mm;
+        _speed_mm_r = _speed_mm;
     }
-    pc.printf("%f\r\n\r\n", diff);
 }
 
 
