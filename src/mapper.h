@@ -57,6 +57,7 @@ public:
     bool check_moved_distance(uint32_t dist);
     int move_forward(uint32_t dist);
     void move_straight();
+    void orientation();
     void update_position();
     Measurement get_measurements();
     State fx(State _x);
@@ -66,11 +67,16 @@ public:
     int32_t x = 0;  // X coordinate relative to start in millimiters
     int32_t y = 0;  // Y coordinate relative to start in millimiters
     float theta = M_PI / 2;  // Orientation of robot in radians
+    float target_theta = M_PI / 2;
     State state;
 private:
     float _dt = 0.25;  // Time change between updates in seconds
-    uint32_t _wheel_sep = 150;  // Separation between center of wheels in mm
-    float _speed = 0.3;
+    uint32_t _wheel_sep = 135;  // Separation between center of wheels in mm
+    float _speed = 0;
+    uint32_t _speed_mm_l = 0;
+    uint32_t _speed_mm_r = 0;
+    uint16_t _left_pwm;
+    uint16_t _right_pwm;
     Motor _wheel_l;
     Motor _wheel_r;
     HALLFX_ENCODER _encoder_left;

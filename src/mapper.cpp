@@ -1,7 +1,8 @@
 #include "mapper.h"
+BusOut leds(LED1, LED2, LED3, LED4);
 
 
-// Serial pc(USBTX, USBRX);
+Serial pc(USBTX, USBRX);
 
 Mapper::Mapper():
 _wheel_l(MOTOR_PWM_LEFT, MOTOR_FWD_LEFT, MOTOR_REV_LEFT),
@@ -59,15 +60,47 @@ void Mapper::move_straight() {
         turn_r_n = 0;
         _wheel_r.speed(_speed + 0.05 + 0.01 * ++turn_l_n);
         _wheel_l.speed(_speed);
-        // pc.printf("Turn left\r\n");
     }
     else if (dist_l < dist_r) {
         // need to turn right
         turn_l_n = 0;
         _wheel_r.speed(_speed);
         _wheel_l.speed(_speed + 0.05 + 0.01 * ++turn_r_n);
-        // pc.printf("Turn right\r\n");
     }
+}
+
+void Mapper::wheel_speed() {
+    // Has to be slower or same rate as state update
+    static uint16_t last_lv;
+    static uint16_t last_rv;
+    // Check if current speed is less than set speed
+    int tolerance = 5;
+    if ((state.lv < _speed_mm_l - tolerance) && (state.lv <= last_lv)) {
+    if ((state.lv > _speed_mm_l + tolerance) && (state.lv >= last_lv)) {
+    if ((state.rv < _speed_mm_r - tolerance) && (state.lv <= last_lv)) {
+    if ((state.rv > _speed_mm_r + tolerance) && (state.lv >= last_lv)) {
+
+
+
+void Mapper::orientation() {
+    float diff = abs(state.theta - target_theta);
+    if (diff > 5 * M_PI / 180) {
+        if (state.theta > target_theta) {
+            float new_speed = _speed + (_speed == 0) * 0.35 + 0.2 * (diff / (2*M_PI));
+            _wheel_l.speed(new_speed);
+            _wheel_r.speed(_speed + (_speed == 0) * 0.2);
+            pc.printf("%f\r\n", new_speed);
+        } else {
+            float new_speed = _speed + (_speed == 0) * 0.35 + 0.2 * (diff / (2*M_PI));
+            _wheel_l.speed(_speed + (_speed == 0) * 0.2);
+            _wheel_r.speed(new_speed);
+            pc.printf("%f\r\n", new_speed);
+        }
+    } else {
+        _wheel_l.speed(_speed);
+        _wheel_r.speed(_speed);
+    }
+    pc.printf("%f\r\n\r\n", diff);
 }
 
 
