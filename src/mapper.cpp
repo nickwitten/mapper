@@ -100,7 +100,21 @@ void Mapper::wheel_speed() {
     last_rv = state.rv;
 }
 
-
+void Mapper::calibrate_wheel_speed() {
+    for (int i = 0; i <= 10; i++) {
+        _wheel_l.speed(i * 0.1);
+        _wheel_r.speed(i * 0.1);
+        wait(0.1);
+    }
+    for (int i = 10; i >= 0; i--) {
+        float pwm_val = i * 0.1;
+        _wheel_l.speed(pwm_val);
+        _wheel_r.speed(pwm_val);
+        wait(5 * _dt);
+        while (abs(state.lv - prev_state.lv) > 3) wait(_dt);
+        _pwm_speed_map_l.insert(std::pair<float, int16_t>(pwm_val, state.lv));
+    }
+}
 
 void Mapper::orientation() {
     float diff = abs(state.theta - target_theta);
@@ -134,6 +148,11 @@ int Mapper::move_forward(uint32_t dist) {
     return 0;
 }
 
+void Mapper::start_state_update(float dt) {
+    _dt = dt;
+    _update_poll.attach<Mapper, void(Mapper::*)()>(this, &Mapper::update_position, _dt);
+}
+
 void Mapper::update_position() {
     // State will be inacurate if any negative speeds are used!
     Measurement m = get_measurements();
@@ -143,6 +162,7 @@ void Mapper::update_position() {
     nx.y = state.y + (0.5 * _dt * m.lv + 0.5 * _dt * m.rv) * sin(nx.theta);
     nx.lv = m.lv;
     nx.rv = m.rv;
+    prev_state = state;
     state = nx;
     // // x' = f(x)
     // State x_pred = fx(state, _dt);

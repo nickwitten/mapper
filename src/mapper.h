@@ -2,6 +2,7 @@
 #include "Motor.h"
 #include "VL53L0X.h"
 #include "HALLFX_ENCODER.h"
+#include <map>
 
 #define MOTOR_PWM_LEFT p22
 #define MOTOR_PWM_RIGHT p21
@@ -53,6 +54,7 @@ class Mapper {
 public:
     Mapper();
     ~Mapper();
+    void start_state_update(float dt);
     int drive(float speed);
     bool check_moved_distance(uint32_t dist);
     int move_forward(uint32_t dist);
@@ -60,6 +62,7 @@ public:
     void wheel_speed();
     void orientation();
     void update_position();
+    void calibrate_wheel_speed();
     Measurement get_measurements();
     State fx(State _x);
     Measurement hx(State _x);
@@ -70,6 +73,7 @@ public:
     float theta = M_PI / 2;  // Orientation of robot in radians
     float target_theta = M_PI / 2;
     State state;
+    State prev_state;
 // private:
     float _dt = 0.25;  // Time change between updates in seconds
     uint32_t _wheel_sep = 135;  // Separation between center of wheels in mm
@@ -90,4 +94,7 @@ public:
     lidars _lidars;
     void _init_lidar();
     uint32_t _map_thresh_mm = 500;  // Objects must be this close to be mapped
+    Ticker _update_poll;
+    std::map<float, uint16_t> _pwm_speed_map_l;
+    std::map<float, uint16_t> _pwm_speed_map_r;
 };

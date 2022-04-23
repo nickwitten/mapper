@@ -22,15 +22,18 @@ Mapper robot;
 
 
 int main() {
-    Ticker update_poll;
-    Ticker orientation_poll;
-    Ticker speed_poll;
-    update_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::update_position, 0.05);
-    speed_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::wheel_speed, 0.05);
-    orientation_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::orientation, 0.05);
+    // Ticker orientation_poll;
+    // Ticker speed_poll;
+    robot.start_state_update(0.25);
+    robot.calibrate_wheel_speed();
+    map<float, uint16_t>::iterator itr;
+    for (itr = robot._pwm_speed_map_l.begin(); itr != robot._pwm_speed_map_l.end(); ++itr) {
+        pc.printf("%.2f: %d\r\n", itr->first, itr->second);
+    }
+    // speed_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::wheel_speed, 0.05);
+    // orientation_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::orientation, 0.05);
     // robot.drive(0.4);
     robot.target_theta = 0;
-    robot._wheel_l.speed(1.0);
     while (1) {
         pc.printf("LV: %d\r\nRV: %d\r\n", robot.state.lv, robot.state.rv);
         pc.printf("PWML: %f\r\nPWMR: %f\r\n", robot._pwm_l, robot._pwm_r);
