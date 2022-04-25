@@ -12,7 +12,7 @@ void plot_surrounding() {
     LIDAR_DIRECTION dirs[3] = {CENTER, LEFT, RIGHT};
     for (auto dir : dirs) {
         if (!robot.plot_object(dir, measured_point)) {
-            pc.printf("[%ld, %ld],\r\n", measured_point.x, measured_point.y);
+            pc.printf("%ld, %ld\r\n", measured_point.x, measured_point.y);
             if (dir == CENTER)  {
                 float dist_from_robot = sqrt( pow(robot.state.x - measured_point.x, 2) + pow(robot.state.y - measured_point.y, 2) );
                 if (dist_from_robot < 150) {
