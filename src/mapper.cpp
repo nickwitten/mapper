@@ -2,7 +2,7 @@
 BusOut leds(LED1, LED2, LED3, LED4);
 
 
-// Serial pc(USBTX, USBRX);
+Serial pc(USBTX, USBRX);
 
 Mapper::Mapper():
 _wheel_l(MOTOR_PWM_LEFT, MOTOR_FWD_LEFT, MOTOR_REV_LEFT),
@@ -44,28 +44,24 @@ bool Mapper::check_moved_distance(uint32_t dist) {
 }
 
 void Mapper::move_straight() {
-    static uint16_t last_enc_count_l = 0;
-    static uint16_t last_enc_count_r = 0;
-    static uint16_t turn_l_n = 0;  // Amount of times in a row needs to turn left
-    static uint16_t turn_r_n = 0;  // Amount of times in a row needs to turn right
-    uint16_t count_l = _encoder_left.read();
-    uint16_t count_r = _encoder_right.read();
-    float dist_l = 0.5672320068 * (count_l - last_enc_count_l);  // unit in mm
-    float dist_r = 0.5672320068 * (count_r - last_enc_count_r);
-    last_enc_count_l = count_l;
-    last_enc_count_r = count_r;
-    if (dist_l < 0 || dist_r < 0) return;  // If encoder was reset
-    if (dist_l > dist_r) {
+    // static uint16_t last_enc_count_l = 0;
+    // static uint16_t last_enc_count_r = 0;
+    // uint16_t count_l = _encoder_left.read();
+    // uint16_t count_r = _encoder_right.read();
+    // float dist_l = 0.5672320068 * (count_l - last_enc_count_l);  // unit in mm
+    // float dist_r = 0.5672320068 * (count_r - last_enc_count_r);
+    // last_enc_count_l = count_l;
+    // last_enc_count_r = count_r;
+    // if (dist_l < 0 || dist_r < 0) return;  // If encoder was reset
+    if (state.lv > state.rv) {
         // need turn left
-        turn_r_n = 0;
-        _wheel_r.speed(_speed + 0.05 + 0.01 * ++turn_l_n);
+        _wheel_r.speed(_speed + 0.2);
         _wheel_l.speed(_speed);
     }
-    else if (dist_l < dist_r) {
+    else if (state.rv > state.lv) {
         // need to turn right
-        turn_l_n = 0;
         _wheel_r.speed(_speed);
-        _wheel_l.speed(_speed + 0.05 + 0.01 * ++turn_r_n);
+        _wheel_l.speed(_speed + 0.2);
     }
 }
 
@@ -161,8 +157,8 @@ Measurement Mapper::get_measurements() {
     Measurement z;
     int lr = _encoder_left.read();
     int rr = _encoder_right.read();
-    float ld = 0.5672320068 * (lr); //unit in mm
-    float rd = 0.5672320068 * (rr);
+    float ld = 0.5847 * (lr); //unit in mm
+    float rd = 0.5847 * (rr);
     z.lv = ld / _dt;
     z.rv = rd / _dt;
     _encoder_left.reset();
@@ -208,8 +204,8 @@ int Mapper::plot_object(LIDAR_DIRECTION dir, Point &p) {
             default:
                 error("INVALID LIDAR DIRECTION\r\n");
         };
-        p.x = x + cos(l_theta) * dist;
-        p.y = y + sin(l_theta) * dist;
+        p.x = state.x + cos(l_theta) * dist;
+        p.y = state.y + sin(l_theta) * dist;
         return 0;
     }
     return -1;
