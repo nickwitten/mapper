@@ -145,8 +145,8 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     if (target_speed != last_speed) {
         *_lv_diff = target_speed - last_speed;
         *_rv_diff = target_speed - last_speed;
-        _pwm_l = (target_speed - _pwm_speed_b_l) / _pwm_speed_m_l;
-        _pwm_r = (target_speed - _pwm_speed_b_r) / _pwm_speed_m_r;
+        _pwm_l = (target_speed != 0) ? (target_speed - _pwm_speed_b_l) / _pwm_speed_m_l : 0;
+        _pwm_r = (target_speed != 0) ? (target_speed - _pwm_speed_b_r) / _pwm_speed_m_r : 0;
         last_speed = target_speed;
     }
     int32_t v_off = _pid->calculate((double)target_theta, (double)state.theta);  // Offset in velocities between wheel
