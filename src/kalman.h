@@ -3,7 +3,7 @@
 #include "rtos.h"
 
 
-Serial pc(USBTX, USBRX);
+extern Serial pc;
 Mapper robot;
 
 
@@ -22,16 +22,16 @@ Mapper robot;
 
 
 int main() {
-    // Ticker orientation_poll;
-    // Ticker speed_poll;
     robot.start_state_update(0.25);
     robot.calibrate_wheel_speed();
-    map<float, uint16_t>::iterator itr;
-    for (itr = robot._pwm_speed_map_l.begin(); itr != robot._pwm_speed_map_l.end(); ++itr) {
-        pc.printf("%.2f: %d\r\n", itr->first, itr->second);
-    }
-    // speed_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::wheel_speed, 0.05);
-    // orientation_poll.attach<Mapper, void(Mapper::*)()>(&robot, &Mapper::orientation, 0.05);
+
+    pc.printf("Calibrated\r\n");
+    pc.printf("Setting speed to 200 mm/s");
+    // robot.target_speed = 200;
+    // std::map<float, uint16_t>::iterator itr;
+    // for (itr = robot._pwm_speed_map_l.begin(); itr != robot._pwm_speed_map_l.end(); ++itr) {
+    //     pc.printf("%.2f: %d\r\n", itr->first, itr->second);
+    // }
     // robot.drive(0.4);
     robot.target_theta = 0;
     while (1) {

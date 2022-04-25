@@ -1,6 +1,10 @@
-#include "mapper.h"
-BusOut leds(LED1, LED2, LED3, LED4);
+#ifndef _MAPPER_SOURCE_
+#define _MAPPER_SOURCE_
 
+#include "mapper.h"
+
+BusOut leds(LED1, LED2, LED3, LED4);
+Serial pc(USBTX, USBRX);
 
 // Serial pc(USBTX, USBRX);
 
@@ -23,137 +27,82 @@ Mapper::~Mapper() {
     delete _lidars.center;
     delete _lidars.left;
     delete _lidars.right;
-}
-
-int Mapper::drive(float speed) {
-    _speed = speed;
-    _wheel_l.speed(speed);
-    _wheel_r.speed(speed);
-    return 0;
-}
-
-bool Mapper::check_moved_distance(uint32_t dist) {
-    int lr = _encoder_left.read();
-    int rr = _encoder_right.read();
-    float ld = 0.5672320068 * (lr); //unit in mm
-    float rd = 0.5672320068 * (rr);
-    float total_d = (ld + rd) / 2;
-    x = 0;
-    y = total_d;
-    return y >= dist - 45;
-}
-
-void Mapper::move_straight() {
-    static uint16_t last_enc_count_l = 0;
-    static uint16_t last_enc_count_r = 0;
-    static uint16_t turn_l_n = 0;  // Amount of times in a row needs to turn left
-    static uint16_t turn_r_n = 0;  // Amount of times in a row needs to turn right
-    uint16_t count_l = _encoder_left.read();
-    uint16_t count_r = _encoder_right.read();
-    float dist_l = 0.5672320068 * (count_l - last_enc_count_l);  // unit in mm
-    float dist_r = 0.5672320068 * (count_r - last_enc_count_r);
-    last_enc_count_l = count_l;
-    last_enc_count_r = count_r;
-    if (dist_l < 0 || dist_r < 0) return;  // If encoder was reset
-    if (dist_l > dist_r) {
-        // need turn left
-        turn_r_n = 0;
-        _wheel_r.speed(_speed + 0.05 + 0.01 * ++turn_l_n);
-        _wheel_l.speed(_speed);
-    }
-    else if (dist_l < dist_r) {
-        // need to turn right
-        turn_l_n = 0;
-        _wheel_r.speed(_speed);
-        _wheel_l.speed(_speed + 0.05 + 0.01 * ++turn_r_n);
+    if (_pid != NULL) {
+        delete _pid;
     }
 }
 
-void Mapper::wheel_speed() {
-    leds = ~leds;
-    // Has to be slower or same rate as state update
-    static uint16_t last_lv = 0;
-    static uint16_t last_rv = 0;
-    float pwm_inc = 0.02;
-    // Check if current speed is less than set speed
-    // and check if speed moved in right direction
-    int tolerance = 10;
-    if ((state.lv < _speed_mm_l - tolerance) && (state.lv <= last_lv)) {
-        _pwm_l += pwm_inc;
-        _pwm_l = (_pwm_l > 1.0) ? 1.0 : _pwm_l;
-    }
-    if ((state.lv > _speed_mm_l + tolerance) && (state.lv >= last_lv)) {
-        _pwm_l -= pwm_inc;
-        _pwm_l = (_pwm_l < 0) ? 0 : _pwm_l;
-    }
-    if ((state.rv < _speed_mm_r - tolerance) && (state.rv <= last_rv)) {
-        _pwm_r += pwm_inc;
-        _pwm_r = (_pwm_r > 1.0) ? 1.0 : _pwm_r;
-    }
-    if ((state.rv > _speed_mm_r + tolerance) && (state.rv >= last_rv)) {
-        _pwm_r -= pwm_inc;
-        _pwm_r = (_pwm_r < 0) ? 0 : _pwm_r;
-    }
-    _wheel_l.speed(_pwm_l);
-    _wheel_r.speed(_pwm_r);
-    last_lv = state.lv;
-    last_rv = state.rv;
-}
-
+// Spin robot around, mapping PWM values to
+// wheel velocities on the current surface,
+// use linear regression to find line of best
+// fit for (pwm, velocity) graph
 void Mapper::calibrate_wheel_speed() {
+    float pwm_val;
+    int32_t av_vel;
+    int samples = 5;
+    // First get robot up to full speed
     for (int i = 0; i <= 10; i++) {
         _wheel_l.speed(i * 0.1);
+        wait(0.1);
+    }
+    // Slow down by 0.1 pwm increments, waiting
+    // for speed to be constant, sample speed
+    // and get average speed to insert into the
+    // pwm to speed mappings.
+    for (int i = 10; i >= 0; i--) {
+        pwm_val = i * 0.1;
+        _wheel_l.speed(pwm_val);
+        wait(_dt);
+        while (abs(state.lv - prev_state.lv) > 3) wait(_dt);
+        av_vel = 0;
+        for (int i = 0; i < samples; i++) {
+            av_vel += state.lv;
+            wait(_dt);
+        }
+        av_vel = av_vel / samples;
+        // Only add the value if it maintains movement
+        if (av_vel > 5) {
+            _pwm_speed_map_l.insert(std::pair<float, int32_t>(pwm_val, av_vel));
+        }
+    }
+    // Repeat for the right side
+    for (int i = 0; i <= 10; i++) {
         _wheel_r.speed(i * 0.1);
         wait(0.1);
     }
     for (int i = 10; i >= 0; i--) {
-        float pwm_val = i * 0.1;
-        _wheel_l.speed(pwm_val);
+        pwm_val = i * 0.1;
         _wheel_r.speed(pwm_val);
-        wait(5 * _dt);
-        while (abs(state.lv - prev_state.lv) > 3) wait(_dt);
-        _pwm_speed_map_l.insert(std::pair<float, int16_t>(pwm_val, state.lv));
-    }
-}
-
-void Mapper::orientation() {
-    float diff = abs(state.theta - target_theta);
-    if (diff > 5 * M_PI / 180) {
-        if (state.theta > target_theta) {
-            // float new_speed = _speed + (_speed == 0) * 0.35 + 0.2 * (diff / (2*M_PI));
-            // _wheel_l.speed(new_speed);
-            // _wheel_r.speed(_speed + (_speed == 0) * 0.2);
-            _speed_mm_l = _speed_mm + 20;
-            _speed_mm_r = _speed_mm;
-        } else {
-            _speed_mm_l = _speed_mm;
-            _speed_mm_r = _speed_mm + 20;
+        wait(_dt);
+        while (abs(state.rv - prev_state.rv) > 3) wait(_dt);
+        av_vel = 0;
+        for (int i = 0; i < samples; i++) {
+            av_vel += state.rv;
+            wait(_dt);
         }
-    } else {
-        _speed_mm_l = _speed_mm;
-        _speed_mm_r = _speed_mm;
+        av_vel = av_vel / samples;
+        if (av_vel > 10) {
+            _pwm_speed_map_r.insert(std::pair<float, int32_t>(pwm_val, av_vel));
+        }
     }
-}
-
-
-int Mapper::move_forward(uint32_t dist) {
-    //pc.printf("total_d: %f\n\r",total_d);
-    _encoder_left.reset();
-    _encoder_right.reset();
-    _wheel_l.speed(0.3);
-    _wheel_r.speed(0.3);
-    while (!check_moved_distance(dist));
-    _wheel_l.speed(0);
-    _wheel_r.speed(0);
-    return 0;
+    linearize_map(_pwm_speed_map_l, &_pwm_speed_m_l, &_pwm_speed_b_l);
+    linearize_map(_pwm_speed_map_r, &_pwm_speed_m_r, &_pwm_speed_b_r);
 }
 
 void Mapper::start_state_update(float dt) {
     _dt = dt;
-    _update_poll.attach<Mapper, void(Mapper::*)()>(this, &Mapper::update_position, _dt);
+    _update_poll.attach<Mapper, void(Mapper::*)()>(this, &Mapper::update_state, _dt);
+
+    // /*             dt,  max,  min,         Kp,             Kd,              Ki   */
+    // _pid = new PID(dt,  200, -200, 200 / M_PI,     200 / M_PI,       20 / M_PI);
+    // /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
+
+    /*             dt,  max,  min,         Kp,             Kd,              Ki   */
+    _pid = new PID(dt,  200, -200, 200 / M_PI,              0,               0);
+    /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
 }
 
-void Mapper::update_position() {
+void Mapper::update_state() {
     // State will be inacurate if any negative speeds are used!
     Measurement m = get_measurements();
     State nx;
@@ -162,8 +111,13 @@ void Mapper::update_position() {
     nx.y = state.y + (0.5 * _dt * m.lv + 0.5 * _dt * m.rv) * sin(nx.theta);
     nx.lv = m.lv;
     nx.rv = m.rv;
-    prev_state = state;
-    state = nx;
+
+    // Control variables, amount that we are changing
+    // the speed on the left and right wheels
+    int32_t lv_diff;
+    int32_t rv_diff;
+    update_control(&lv_diff, &rv_diff);
+
     // // x' = f(x)
     // State x_pred = fx(state, _dt);
     // // z' = z - h(x)
@@ -175,6 +129,44 @@ void Mapper::update_position() {
     // residual.theta = z.theta - z_pred.theta;
     // // 
     // state = 
+    prev_state = state;
+    state = nx;
+}
+
+void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
+    static int32_t last_speed = 0;  // keep track of a target speed change
+    static float pwm_add_l = 0;  // How much pwm added to base pwm
+    static float pwm_add_r = 0;
+    *_lv_diff = 0;  // Initialize change in velocities to 0
+    *_rv_diff = 0;
+    // If the target speed was changed, add the change from current
+    // state to the diffs, update our base pwm values, and store in
+    // static last speed.
+    if (target_speed != last_speed) {
+        *_lv_diff = target_speed - last_speed;
+        *_rv_diff = target_speed - last_speed;
+        _pwm_l = (target_speed - _pwm_speed_b_l) / _pwm_speed_m_l;
+        _pwm_r = (target_speed - _pwm_speed_b_r) / _pwm_speed_m_r;
+        last_speed = target_speed;
+    }
+    int32_t v_off = _pid->calculate((double)target_theta, (double)state.theta);  // Offset in velocities between wheel
+    // Left wheel goes faster
+    if (v_off < 0 ) {
+        // Take all extra speed off right wheel
+        *_rv_diff -= pwm_add_r * _pwm_speed_m_r;
+        pwm_add_r = 0;
+        // Add extra pwm to left
+        *_lv_diff += v_off - (pwm_add_l * _pwm_speed_m_l);  // This could be negative
+        pwm_add_l = (1 / _pwm_speed_m_l) * v_off;
+    } else {
+        *_lv_diff -= pwm_add_l * _pwm_speed_m_l;
+        pwm_add_l = 0;
+        *_rv_diff += v_off - (pwm_add_r * _pwm_speed_m_r);
+        pwm_add_r = (1 / _pwm_speed_m_r) * v_off;
+    }
+    // Finally set our
+    _wheel_l.speed(_pwm_l + pwm_add_l);
+    _wheel_r.speed(_pwm_r + pwm_add_r);
 }
 
 Measurement Mapper::get_measurements() {
@@ -214,22 +206,22 @@ int Mapper::plot_object(LIDAR_DIRECTION dir, Point &p) {
     uint32_t dist;
     int status = read_dist(dir, dist);
     if (status == VL53L0X_ERROR_NONE && dist <= _map_thresh_mm) {
-        float l_theta = 0;
+        float theta = 0;
         switch (dir) {
             case CENTER:
-                l_theta = theta;
+                theta = state.theta;
                 break;
             case LEFT:
-                l_theta = theta + M_PI / 2;
+                theta = state.theta + M_PI / 2;
                 break;
             case RIGHT:
-                l_theta = theta - M_PI / 2;
+                theta = state.theta - M_PI / 2;
                 break;
             default:
                 error("INVALID LIDAR DIRECTION\r\n");
         };
-        p.x = x + cos(l_theta) * dist;
-        p.y = y + sin(l_theta) * dist;
+        p.x = x + cos(theta) * dist;
+        p.y = y + sin(theta) * dist;
         return 0;
     }
     return -1;
@@ -278,3 +270,5 @@ void Mapper::_init_lidar() {
         // error("FAILED TO INITIALIZE RIGHT LIDAR\r\n");
     }
 }
+
+#endif
