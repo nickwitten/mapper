@@ -12,11 +12,11 @@ DATA_NAME = "points.pkl"
 PI_IP = "128.61.66.118"
 
 while True:
-    ret = subprocess.run(["scp", f'pi@{PI_IP}:{PI_PROJECT_DIR}{DATA_DIR}{DATA_NAME}', f'{PC_PROJECT_DIR}{DATA_DIR}{DATA_NAME}'])
+    ret = subprocess.run(["scp", f'pi@{PI_IP}:{PI_PROJECT_DIR}{DATA_DIR}{DATA_NAME}', f'{PC_PROJECT_DIR}{DATA_DIR}{DATA_NAME}'], capture_output=True)
     if ret.returncode != 0:
         print(ret.stderr.decode('utf-8'))
-        print("Could not reach the data on {PI_IP}")
-        sys.exit()
+        print(f'Could not reach the data on {PI_IP}')
+        continue
 
     with open(PC_PROJECT_DIR + DATA_DIR + "points.pkl", "rb") as f:
         points = pkl.load(f)
