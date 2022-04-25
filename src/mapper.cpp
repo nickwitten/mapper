@@ -32,16 +32,16 @@ int Mapper::drive(float speed) {
     return 0;
 }
 
-bool Mapper::check_moved_distance(uint32_t dist) {
-    int lr = _encoder_left.read();
-    int rr = _encoder_right.read();
-    float ld = 0.5672320068 * (lr); //unit in mm
-    float rd = 0.5672320068 * (rr);
-    float total_d = (ld + rd) / 2;
-    x = 0;
-    y = total_d;
-    return y >= dist - 45;
-}
+// bool Mapper::check_moved_distance(uint32_t dist) {
+//     int lr = _encoder_left.read();
+//     int rr = _encoder_right.read();
+//     float ld = 0.5672320068 * (lr); //unit in mm
+//     float rd = 0.5672320068 * (rr);
+//     float total_d = (ld + rd) / 2;
+//     x = 0;
+//     y = total_d;
+//     return y >= dist - 45;
+// }
 
 void Mapper::move_straight() {
     // static uint16_t last_enc_count_l = 0;
@@ -65,70 +65,70 @@ void Mapper::move_straight() {
     }
 }
 
-void Mapper::wheel_speed() {
-    leds = ~leds;
-    // Has to be slower or same rate as state update
-    static uint16_t last_lv = 0;
-    static uint16_t last_rv = 0;
-    float pwm_inc = 0.02;
-    // Check if current speed is less than set speed
-    // and check if speed moved in right direction
-    int tolerance = 10;
-    if ((state.lv < _speed_mm_l - tolerance) && (state.lv <= last_lv)) {
-        _pwm_l += pwm_inc;
-        _pwm_l = (_pwm_l > 1.0) ? 1.0 : _pwm_l;
-    }
-    if ((state.lv > _speed_mm_l + tolerance) && (state.lv >= last_lv)) {
-        _pwm_l -= pwm_inc;
-        _pwm_l = (_pwm_l < 0) ? 0 : _pwm_l;
-    }
-    if ((state.rv < _speed_mm_r - tolerance) && (state.rv <= last_rv)) {
-        _pwm_r += pwm_inc;
-        _pwm_r = (_pwm_r > 1.0) ? 1.0 : _pwm_r;
-    }
-    if ((state.rv > _speed_mm_r + tolerance) && (state.rv >= last_rv)) {
-        _pwm_r -= pwm_inc;
-        _pwm_r = (_pwm_r < 0) ? 0 : _pwm_r;
-    }
-    _wheel_l.speed(_pwm_l);
-    _wheel_r.speed(_pwm_r);
-    last_lv = state.lv;
-    last_rv = state.rv;
-}
+// void Mapper::wheel_speed() {
+//     leds = ~leds;
+//     // Has to be slower or same rate as state update
+//     static uint16_t last_lv = 0;
+//     static uint16_t last_rv = 0;
+//     float pwm_inc = 0.02;
+//     // Check if current speed is less than set speed
+//     // and check if speed moved in right direction
+//     int tolerance = 10;
+//     if ((state.lv < _speed_mm_l - tolerance) && (state.lv <= last_lv)) {
+//         _pwm_l += pwm_inc;
+//         _pwm_l = (_pwm_l > 1.0) ? 1.0 : _pwm_l;
+//     }
+//     if ((state.lv > _speed_mm_l + tolerance) && (state.lv >= last_lv)) {
+//         _pwm_l -= pwm_inc;
+//         _pwm_l = (_pwm_l < 0) ? 0 : _pwm_l;
+//     }
+//     if ((state.rv < _speed_mm_r - tolerance) && (state.rv <= last_rv)) {
+//         _pwm_r += pwm_inc;
+//         _pwm_r = (_pwm_r > 1.0) ? 1.0 : _pwm_r;
+//     }
+//     if ((state.rv > _speed_mm_r + tolerance) && (state.rv >= last_rv)) {
+//         _pwm_r -= pwm_inc;
+//         _pwm_r = (_pwm_r < 0) ? 0 : _pwm_r;
+//     }
+//     _wheel_l.speed(_pwm_l);
+//     _wheel_r.speed(_pwm_r);
+//     last_lv = state.lv;
+//     last_rv = state.rv;
+// }
 
 
 
-void Mapper::orientation() {
-    float diff = abs(state.theta - target_theta);
-    if (diff > 5 * M_PI / 180) {
-        if (state.theta > target_theta) {
-            // float new_speed = _speed + (_speed == 0) * 0.35 + 0.2 * (diff / (2*M_PI));
-            // _wheel_l.speed(new_speed);
-            // _wheel_r.speed(_speed + (_speed == 0) * 0.2);
-            _speed_mm_l = _speed_mm + 20;
-            _speed_mm_r = _speed_mm;
-        } else {
-            _speed_mm_l = _speed_mm;
-            _speed_mm_r = _speed_mm + 20;
-        }
-    } else {
-        _speed_mm_l = _speed_mm;
-        _speed_mm_r = _speed_mm;
-    }
-}
+// void Mapper::orientation() {
+//     float diff = abs(state.theta - target_theta);
+//     if (diff > 5 * M_PI / 180) {
+//         if (state.theta > target_theta) {
+//             // float new_speed = _speed + (_speed == 0) * 0.35 + 0.2 * (diff / (2*M_PI));
+//             // _wheel_l.speed(new_speed);
+//             // _wheel_r.speed(_speed + (_speed == 0) * 0.2);
+//             _speed_mm_l = _speed_mm + 20;
+//             _speed_mm_r = _speed_mm;
+//         } else {
+//             _speed_mm_l = _speed_mm;
+//             _speed_mm_r = _speed_mm + 20;
+//         }
+//     } else {
+//         _speed_mm_l = _speed_mm;
+//         _speed_mm_r = _speed_mm;
+//     }
+// }
 
 
-int Mapper::move_forward(uint32_t dist) {
-    //pc.printf("total_d: %f\n\r",total_d);
-    _encoder_left.reset();
-    _encoder_right.reset();
-    _wheel_l.speed(0.3);
-    _wheel_r.speed(0.3);
-    while (!check_moved_distance(dist));
-    _wheel_l.speed(0);
-    _wheel_r.speed(0);
-    return 0;
-}
+// int Mapper::move_forward(uint32_t dist) {
+//     //pc.printf("total_d: %f\n\r",total_d);
+//     _encoder_left.reset();
+//     _encoder_right.reset();
+//     _wheel_l.speed(0.3);
+//     _wheel_r.speed(0.3);
+//     while (!check_moved_distance(dist));
+//     _wheel_l.speed(0);
+//     _wheel_r.speed(0);
+//     return 0;
+// }
 
 void Mapper::update_position() {
     // State will be inacurate if any negative speeds are used!
@@ -166,23 +166,23 @@ Measurement Mapper::get_measurements() {
     return z;
 }
 
-State Mapper::fx(State _x) {
-    State nx;
-    nx.x += (0.5 * _dt * state.lv + 0.5 * _dt * state.rv) * cos(state.theta);
-    nx.y += (0.5 * _dt * state.lv + 0.5 * _dt * state.rv) * sin(state.theta);
-    nx.lv = state.lv;
-    nx.rv = state.rv;
-    nx.theta += (_dt * state.rv - _dt * state.lv) / _wheel_sep;
-    return nx;
-}
+// State Mapper::fx(State _x) {
+//     State nx;
+//     nx.x += (0.5 * _dt * state.lv + 0.5 * _dt * state.rv) * cos(state.theta);
+//     nx.y += (0.5 * _dt * state.lv + 0.5 * _dt * state.rv) * sin(state.theta);
+//     nx.lv = state.lv;
+//     nx.rv = state.rv;
+//     nx.theta += (_dt * state.rv - _dt * state.lv) / _wheel_sep;
+//     return nx;
+// }
 
-Measurement Mapper::hx(State _x) {
-    Measurement m;
-    m.lv = _x.lv;
-    m.rv = _x.rv;
-    m.theta = _x.theta;
-    return m;
-}
+// Measurement Mapper::hx(State _x) {
+//     Measurement m;
+//     m.lv = _x.lv;
+//     m.rv = _x.rv;
+//     m.theta = _x.theta;
+//     return m;
+// }
 
 // Returns 0 on map of object
 // Returns -1 on fail to map an object
@@ -190,22 +190,22 @@ int Mapper::plot_object(LIDAR_DIRECTION dir, Point &p) {
     uint32_t dist;
     int status = read_dist(dir, dist);
     if (status == VL53L0X_ERROR_NONE && dist <= _map_thresh_mm) {
-        float l_theta = 0;
+        float theta = 0;
         switch (dir) {
             case CENTER:
-                l_theta = theta;
+                theta = state.theta;
                 break;
             case LEFT:
-                l_theta = theta + M_PI / 2;
+                theta = state.theta + M_PI / 2;
                 break;
             case RIGHT:
-                l_theta = theta - M_PI / 2;
+                theta = state.theta - M_PI / 2;
                 break;
             default:
                 error("INVALID LIDAR DIRECTION\r\n");
         };
-        p.x = state.x + cos(l_theta) * dist;
-        p.y = state.y + sin(l_theta) * dist;
+        p.x = state.x + cos(theta) * dist;
+        p.y = state.y + sin(theta) * dist;
         return 0;
     }
     return -1;
