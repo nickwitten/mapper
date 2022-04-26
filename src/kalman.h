@@ -7,19 +7,31 @@ extern Serial pc;
 Mapper robot;
 
 
-// void plot_surrounding() {
-//     while(1) {
-//         Point measured_point = {0, 0};
-//         LIDAR_DIRECTION dirs[3] = {CENTER, LEFT, RIGHT};
-//         for (auto dir : dirs) {
-//             if (!robot.plot_object(dir, measured_point)) {
-//                 pc.printf("[%ld, %ld],\r\n", measured_point.x, measured_point.y);
-//             }
-//         }
-//         Thread::wait(10);
-//     }
-// }
-//
+Thread turn_t;
+void turn() {
+    robot.target_speed = 50;
+    robot.target_theta -= M_PI / 2;
+    Thread::wait(3);
+    robot.target_speed = 300;
+}
+
+void plot_surrounding() {
+    Point measured_point = {0, 0};
+    LIDAR_DIRECTION dirs[3] = {CENTER, LEFT, RIGHT};
+    for (auto dir : dirs) {
+        if (!robot.plot_object(dir, measured_point)) {
+            pc.printf("%d, %d\r\n", measured_point.x, measured_point.y);
+            if (dir == CENTER) {
+                if (sqrt(pow(measured_point.x - robot.state.x, 2) + pow(measured_point.y - robot.state.y, 2)) < 150) {
+                    if (turn_t.get_state() == Thread::Inactive) {
+                        turn_t.start(Callback<void()>(&turn));
+                    }
+                }
+            }
+        }
+    }
+}
+
 void print_state() {
     pc.printf("X: %d, Y: %d, THETA: %.1f\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI);
     pc.printf("LV: %d, RV: %d\r\n", robot.state.lv, robot.state.rv);
@@ -27,14 +39,7 @@ void print_state() {
     pc.printf("VOFF: %d, PWMADDL: %.2f, PWMADDR: %.2f\r\n\r\n", robot.v_off, robot.pwm_add_l, robot.pwm_add_r);
 }
 
-
-int main() {
-    robot.start_state_update(0.05);
-    robot.control = false;
-    robot.calibrate_wheel_speed();
-    robot.control = true;
-
-    pc.printf("Calibrated:\r\n");
+void print_cal() {
     std::map<float, int32_t>::iterator itr;
     pc.printf("Left samples:\r\n");
     for (itr = robot._pwm_speed_map_l.begin(); itr != robot._pwm_speed_map_l.end(); ++itr) {
@@ -50,43 +55,21 @@ int main() {
     pc.printf("RIGHT:\r\n");
     pc.printf("\t%f (mm/s) / v\r\n", robot._pwm_speed_m_r);
     pc.printf("\t%f mm/s at 0 V\r\n", robot._pwm_speed_b_r);
+}
 
-    // pc.printf("Setting speed to 200 mm/s");
-    // robot.target_speed = 200;
-    // wait(10 * robot._dt);
-    // pc.printf("PWML: %f\r\nPWMR: %f\r\n", robot._pwm_l, robot._pwm_r);
-    // for (int i = 0; i < 5; i++) {
-    //     pc.printf("LV: %d\r\nRV: %d\r\n", robot.state.lv, robot.state.rv);
-    //     pc.printf("X: %d\r\nY: %d\r\nTHETA: %.1f\r\n\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI);
-    //     wait(20 * robot._dt);
-    // }
 
-    // pc.printf("Setting speed to 0 mm/s");
-    // robot.target_speed = 0;
-    // wait(10 * robot._dt);
-    // pc.printf("LV: %d\r\nRV: %d\r\n", robot.state.lv, robot.state.rv);
-    // pc.printf("X: %d\r\nY: %d\r\nTHETA: %.1f\r\n\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI);
+int main() {
+    robot.start_state_update(0.05);
+    robot.control = false;
+    robot.calibrate_wheel_speed();
+    robot.control = true;
 
+    pc.printf("Calibrated:\r\n");
+    print_cal();
 
     robot.target_speed = 300;
     // robot.control = false;
-    int dir = 1;
     while (1) {
-        while (robot.state.y < 1000 * dir) {
-            print_state();
-            wait(0.5);
-        }
-        robot.target_speed = 50;
-        robot.target_theta -= M_PI;
-        wait(5);
-        robot.target_speed = 400;
-        while (robot.state.y > 0) {
-            print_state();
-            wait(0.5);
-        }
-        robot.target_speed = 50;
-        robot.target_theta -= M_PI;
-        wait(5);
-        robot.target_speed = 400;
+        plot_surrounding();
     }
 }
