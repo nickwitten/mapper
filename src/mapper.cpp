@@ -122,13 +122,14 @@ void Mapper::start_state_update(float dt) {
     _dt = dt;
     _update_poll.attach<Mapper, void(Mapper::*)()>(this, &Mapper::update_state, _dt);
 
-    /*             dt,  max,  min,         Kp,             Kd,              Ki   */
-    // _pid = new PID(dt,  600, -600, 600 / M_PI,     10 / M_PI,       10 / M_PI);
+    /*             dt,  max,  min,         Kp,             Kd,             Ki   */
+//    _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      50 / M_PI);  // Works well at 200 mm/s
+    _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      400 / M_PI);  // Works well at 0 mm/s
     /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
 
-    /*             dt,  max,  min,         Kp,             Kd,              Ki   */
-    _pid = new PID(dt,  600, -600, 600 / M_PI,              0,               0);
-    /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
+//      /*             dt,  max,  min,         Kp,             Kd,              Ki   */
+//      _pid = new PID(dt,  600, -600, 600 / M_PI,              0,               0);
+//      /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
 }
 
 void Mapper::update_state() {
@@ -193,9 +194,11 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
         *_rv_diff += abs(v_off) - (pwm_add_r * _pwm_speed_m_r);
         pwm_add_r = (1 / _pwm_speed_m_r) * abs(v_off);
     }
-    // Finally set our
-    _wheel_l.speed(_pwm_l + pwm_add_l);
-    _wheel_r.speed(_pwm_r + pwm_add_r);
+    // Finally set our pwm
+    float pwm_l = _pwm_l + pwm_add_l;
+    float pwm_r = _pwm_r + pwm_add_r;
+    _wheel_l.speed(pwm_l <= 1.0 ? pwm_l : 1.0);
+    _wheel_r.speed(pwm_r <= 1.0 ? pwm_r : 1.0);
 }
 
 Measurement Mapper::get_measurements() {
