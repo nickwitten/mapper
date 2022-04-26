@@ -102,13 +102,17 @@ public:
     float target_theta = M_PI / 2;
     State state;
     State prev_state;
+    bool control = true;  // Whether the robot tries to correct theta or not
 // private:
-    float _dt = 0.25;  // Time change between updates in seconds
-    uint32_t _wheel_sep = 135;  // Separation between center of wheels in mm
+    float _dt = 0;  // Time change between updates in seconds
+    uint32_t _wheel_sep = 163;  // Separation between center of wheels in mm
+    // float _wheel_circ = 210.49;  // Wheel circumference in mm
+    float _wheel_circ = 230.0;  // Wheel circumference in mm
+    float _encoder_cpr = 360.0;  // Encoder count per rotation
     Motor _wheel_l;
     Motor _wheel_r;
-    float _pwm_l;
-    float _pwm_r;
+    float _pwm_l = 0.0;
+    float _pwm_r = 0.0;
     HALLFX_ENCODER _encoder_left;
     HALLFX_ENCODER _encoder_right;
     DevI2C _i2c;
@@ -126,6 +130,9 @@ public:
     float _pwm_speed_b_l;
     float _pwm_speed_m_r;
     float _pwm_speed_b_r;
+    int32_t v_off = 0;
+    float pwm_add_l = 0;
+    float pwm_add_r = 0;
     void _init_lidar();
 };
 

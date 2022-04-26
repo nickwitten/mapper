@@ -40,51 +40,83 @@ void Mapper::calibrate_wheel_speed() {
     float pwm_val;
     int32_t av_vel;
     int samples = 5;
-    // First get robot up to full speed
-    for (int i = 0; i <= 10; i++) {
-        _wheel_l.speed(i * 0.1);
-        wait(0.1);
-    }
-    // Slow down by 0.1 pwm increments, waiting
-    // for speed to be constant, sample speed
-    // and get average speed to insert into the
-    // pwm to speed mappings.
-    for (int i = 10; i >= 0; i--) {
-        pwm_val = i * 0.1;
-        _wheel_l.speed(pwm_val);
-        wait(_dt);
-        while (abs(state.lv - prev_state.lv) > 3) wait(_dt);
-        av_vel = 0;
-        for (int i = 0; i < samples; i++) {
-            av_vel += state.lv;
-            wait(_dt);
-        }
-        av_vel = av_vel / samples;
-        // Only add the value if it maintains movement
-        if (av_vel > 5) {
-            _pwm_speed_map_l.insert(std::pair<float, int32_t>(pwm_val, av_vel));
-        }
-    }
-    // Repeat for the right side
-    for (int i = 0; i <= 10; i++) {
-        _wheel_r.speed(i * 0.1);
-        wait(0.1);
-    }
-    for (int i = 10; i >= 0; i--) {
-        pwm_val = i * 0.1;
-        _wheel_r.speed(pwm_val);
-        wait(_dt);
-        while (abs(state.rv - prev_state.rv) > 3) wait(_dt);
-        av_vel = 0;
-        for (int i = 0; i < samples; i++) {
-            av_vel += state.rv;
-            wait(_dt);
-        }
-        av_vel = av_vel / samples;
-        if (av_vel > 10) {
-            _pwm_speed_map_r.insert(std::pair<float, int32_t>(pwm_val, av_vel));
-        }
-    }
+    int32_t prev_speed;
+
+//     // First get robot up to full speed
+//     for (int i = 0; i <= 10; i++) {
+//         _wheel_l.speed(i * 0.1);
+//         wait(0.1);
+//     }
+//     // Slow down by 0.1 pwm increments, waiting
+//     // for speed to be constant, sample speed
+//     // and get average speed to insert into the
+//     // pwm to speed mappings.
+//     for (int i = 10; i >= 0; i--) {
+//         pwm_val = i * 0.1;
+//         _wheel_l.speed(pwm_val);
+//         wait(0.1);
+//         do {
+//             prev_speed = state.lv;
+//             wait(0.1);
+//         } while (abs(state.lv - prev_speed) > 3);
+//         av_vel = 0;
+//         for (int i = 0; i < samples; i++) {
+//             av_vel += state.lv;
+//             wait(0.1);
+//         }
+//         av_vel = av_vel / samples;
+//         // Only add the value if it maintains movement
+//         if (av_vel > 5) {
+//             _pwm_speed_map_l.insert(std::pair<float, int32_t>(pwm_val, av_vel));
+//         }
+//     }
+// 
+//     for (int i = 0; i <= 10; i++) {
+//         _wheel_r.speed(i * 0.1);
+//         wait(0.1);
+//     }
+//     // Slow down by 0.1 pwm increments, waiting
+//     // for speed to be constant, sample speed
+//     // and get average speed to insert into the
+//     // pwm to speed mappings.
+//     for (int i = 10; i >= 0; i--) {
+//         pwm_val = i * 0.1;
+//         _wheel_r.speed(pwm_val);
+//         wait(0.1);
+//         do {
+//             prev_speed = state.rv;
+//             wait(0.1);
+//         } while (abs(state.rv - prev_speed) > 3);
+//         av_vel = 0;
+//         for (int i = 0; i < samples; i++) {
+//             av_vel += state.rv;
+//             wait(0.1);
+//         }
+//         av_vel = av_vel / samples;
+//         // Only add the value if it maintains movement
+//         if (av_vel > 5) {
+//             _pwm_speed_map_r.insert(std::pair<float, int32_t>(pwm_val, av_vel));
+//         }
+//     }
+
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.30, 56));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.40, 106));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.50, 192));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.60, 289));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.70, 356));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.80, 367));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.90, 480));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(1.00, 562));
+
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.30, 47));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.40, 140));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.50, 237));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.60, 280));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.70, 323));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.80, 453));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.90, 469));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(1.00, 553));
+
     linearize_map(_pwm_speed_map_l, &_pwm_speed_m_l, &_pwm_speed_b_l);
     linearize_map(_pwm_speed_map_r, &_pwm_speed_m_r, &_pwm_speed_b_r);
 }
@@ -93,12 +125,12 @@ void Mapper::start_state_update(float dt) {
     _dt = dt;
     _update_poll.attach<Mapper, void(Mapper::*)()>(this, &Mapper::update_state, _dt);
 
-    // /*             dt,  max,  min,         Kp,             Kd,              Ki   */
-    // _pid = new PID(dt,  200, -200, 200 / M_PI,     200 / M_PI,       20 / M_PI);
-    // /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
+    /*             dt,  max,  min,         Kp,             Kd,              Ki   */
+    // _pid = new PID(dt,  700, -700, 200 / M_PI,     10 / M_PI,       10 / M_PI);
+    /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
 
     /*             dt,  max,  min,         Kp,             Kd,              Ki   */
-    _pid = new PID(dt,  200, -200, 200 / M_PI,              0,               0);
+    _pid = new PID(dt,  200, -200, 600 / M_PI,              0,               0);
     /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
 }
 
@@ -114,9 +146,11 @@ void Mapper::update_state() {
 
     // Control variables, amount that we are changing
     // the speed on the left and right wheels
-    int32_t lv_diff;
-    int32_t rv_diff;
-    update_control(&lv_diff, &rv_diff);
+    int32_t lv_diff = 0;
+    int32_t rv_diff = 0;
+    if (control) {
+        update_control(&lv_diff, &rv_diff);
+    }
 
     // // x' = f(x)
     // State x_pred = fx(state, _dt);
@@ -135,8 +169,6 @@ void Mapper::update_state() {
 
 void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     static int32_t last_speed = 0;  // keep track of a target speed change
-    static float pwm_add_l = 0;  // How much pwm added to base pwm
-    static float pwm_add_r = 0;
     *_lv_diff = 0;  // Initialize change in velocities to 0
     *_rv_diff = 0;
     // If the target speed was changed, add the change from current
@@ -149,20 +181,20 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
         _pwm_r = (target_speed != 0) ? (target_speed - _pwm_speed_b_r) / _pwm_speed_m_r : 0;
         last_speed = target_speed;
     }
-    int32_t v_off = _pid->calculate((double)target_theta, (double)state.theta);  // Offset in velocities between wheel
+    v_off = _pid->calculate((double)target_theta, (double)state.theta);  // Offset in velocities between wheel
     // Left wheel goes faster
     if (v_off < 0 ) {
         // Take all extra speed off right wheel
         *_rv_diff -= pwm_add_r * _pwm_speed_m_r;
         pwm_add_r = 0;
         // Add extra pwm to left
-        *_lv_diff += v_off - (pwm_add_l * _pwm_speed_m_l);  // This could be negative
-        pwm_add_l = (1 / _pwm_speed_m_l) * v_off;
+        *_lv_diff += abs(v_off) - (pwm_add_l * _pwm_speed_m_l);  // This could be negative
+        pwm_add_l = (1 / _pwm_speed_m_l) * abs(v_off);
     } else {
         *_lv_diff -= pwm_add_l * _pwm_speed_m_l;
         pwm_add_l = 0;
-        *_rv_diff += v_off - (pwm_add_r * _pwm_speed_m_r);
-        pwm_add_r = (1 / _pwm_speed_m_r) * v_off;
+        *_rv_diff += abs(v_off) - (pwm_add_r * _pwm_speed_m_r);
+        pwm_add_r = (1 / _pwm_speed_m_r) * abs(v_off);
     }
     // Finally set our
     _wheel_l.speed(_pwm_l + pwm_add_l);
@@ -170,11 +202,13 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
 }
 
 Measurement Mapper::get_measurements() {
+    static float dpc = _wheel_circ / _encoder_cpr;  // distance per encoder count in mm
+    // static float dpc = 0.5847;
     Measurement z;
-    int lr = _encoder_left.read();
-    int rr = _encoder_right.read();
-    float ld = 0.5672320068 * (lr); //unit in mm
-    float rd = 0.5672320068 * (rr);
+    int l_ct = _encoder_left.read();
+    int r_ct = _encoder_right.read();
+    float ld = dpc * l_ct; //unit in mm
+    float rd = dpc * r_ct; //unit in mm
     z.lv = ld / _dt;
     z.rv = rd / _dt;
     _encoder_left.reset();
