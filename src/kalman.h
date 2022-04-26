@@ -61,8 +61,8 @@ int main() {
     // pc.printf("X: %d\r\nY: %d\r\nTHETA: %.1f\r\n\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI);
 
     pc.printf("Setting theta to 0\r\n");
-    robot.target_theta = 0;
-    robot.target_speed = 200;
+    robot.target_theta = - M_PI / 2;
+    robot.target_speed = 50;
     // robot.control = false;
     while (1) {
         pc.printf("X: %d, Y: %d, THETA: %.1f\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI);

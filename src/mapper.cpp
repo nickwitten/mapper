@@ -121,11 +121,7 @@ void Mapper::calibrate_wheel_speed() {
 void Mapper::start_state_update(float dt) {
     _dt = dt;
     _update_poll.attach<Mapper, void(Mapper::*)()>(this, &Mapper::update_state, _dt);
-
-    /*             dt,  max,  min,         Kp,             Kd,             Ki   */
-//    _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      50 / M_PI);  // Works well at 200 mm/s
-    _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      400 / M_PI);  // Works well at 0 mm/s
-    /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
+    _init_pid(target_speed);
 }
 
 void Mapper::update_state() {
@@ -161,14 +157,17 @@ void Mapper::update_state() {
     state = nx;
 }
 
-void Mapper::init_pid(int32_t speed) {
+void Mapper::_init_pid(int32_t speed) {
     if (_pid != NULL) {
         delete _pid;
     }
     if (speed == 0) {
-        _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      400 / M_PI);  // Works well at 0 mm/s
+        /*              s, mm/s, mm/s, (mm/s)/rad  , (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
+        _pid = new PID(_dt,  800, -800,   800 / M_PI,    20 / M_PI  ,    400 /  M_PI);  // Works well at 0 mm/s
+    } else if (speed < 100) {
+        _pid = new PID(_dt,  800, -800, 1000 / M_PI,      100 / M_PI,      50 / M_PI);  // Works well at 50 mm/s (works as if at 0 mm/s)
     } else {
-        _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      50 / M_PI);  // Works well at 200 mm/s
+        _pid = new PID(_dt,  800, -800, 800 / M_PI,      20 / M_PI,      50 / M_PI);  // Works well at 200 mm/s
     }
 }
 
@@ -184,7 +183,7 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
         *_rv_diff = target_speed - last_speed;
         _pwm_l = (target_speed != 0) ? (target_speed - _pwm_speed_b_l) / _pwm_speed_m_l : 0;
         _pwm_r = (target_speed != 0) ? (target_speed - _pwm_speed_b_r) / _pwm_speed_m_r : 0;
-        init_pid(target_speed);
+        _init_pid(target_speed);
         last_speed = target_speed;
     }
     v_off = _pid->calculate((double)target_theta, (double)state.theta);  // Offset in velocities between wheel

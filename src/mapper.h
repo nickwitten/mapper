@@ -134,6 +134,7 @@ public:
     float pwm_add_l = 0;
     float pwm_add_r = 0;
     void _init_lidar();
+    void _init_pid(int32_t speed);
 };
 
 #endif
