@@ -126,11 +126,11 @@ void Mapper::start_state_update(float dt) {
     _update_poll.attach<Mapper, void(Mapper::*)()>(this, &Mapper::update_state, _dt);
 
     /*             dt,  max,  min,         Kp,             Kd,              Ki   */
-    // _pid = new PID(dt,  700, -700, 200 / M_PI,     10 / M_PI,       10 / M_PI);
+    // _pid = new PID(dt,  600, -600, 600 / M_PI,     10 / M_PI,       10 / M_PI);
     /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
 
     /*             dt,  max,  min,         Kp,             Kd,              Ki   */
-    _pid = new PID(dt,  200, -200, 600 / M_PI,              0,               0);
+    _pid = new PID(dt,  600, -600, 600 / M_PI,              0,               0);
     /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
 }
 
