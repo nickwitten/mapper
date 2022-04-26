@@ -99,6 +99,7 @@ void Mapper::calibrate_wheel_speed() {
         }
     }
 
+// Bedroom floor
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.4, 150));
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.5, 257));
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.6, 337));
@@ -113,6 +114,42 @@ void Mapper::calibrate_wheel_speed() {
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.8, 380));
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.9, 498));
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(1.0, 424));
+//
+//
+// // Study table
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.3, 40));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.4, 132));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.5, 196));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.6, 308));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.7, 359));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.8, 439));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.9, 515));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(1.0, 508));
+// 
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.5, 173));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.6, 222));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.7, 270));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.8, 354));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.9, 431));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(1.0, 464));
+// 
+// Study hallway
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.4, 48 ));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.5, 117));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.6, 168));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.7, 242));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.8, 319));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.9, 357));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(1.0, 347));
+// 
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.4, 22 ));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.5, 86 ));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.6, 135));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.7, 178));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.8, 242));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.9, 265));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(1.0, 349));
+
 
     linearize_map(_pwm_speed_map_l, &_pwm_speed_m_l, &_pwm_speed_b_l);
     linearize_map(_pwm_speed_map_r, &_pwm_speed_m_r, &_pwm_speed_b_r);
@@ -247,22 +284,22 @@ int Mapper::plot_object(LIDAR_DIRECTION dir, Point &p) {
     uint32_t dist;
     int status = read_dist(dir, dist);
     if (status == VL53L0X_ERROR_NONE && dist <= _map_thresh_mm) {
-        float theta = 0;
+        float s_theta = 0;  // Sensor theta
         switch (dir) {
             case CENTER:
-                theta = state.theta;
+                s_theta = state.theta;
                 break;
             case LEFT:
-                theta = state.theta + M_PI / 2;
+                s_theta = state.theta + M_PI / 2;
                 break;
             case RIGHT:
-                theta = state.theta - M_PI / 2;
+                s_theta = state.theta - M_PI / 2;
                 break;
             default:
                 error("INVALID LIDAR DIRECTION\r\n");
         };
-        p.x = x + cos(theta) * dist;
-        p.y = y + sin(theta) * dist;
+        p.x = state.x + cos(s_theta) * dist;
+        p.y = state.y + sin(s_theta) * dist;
         return 0;
     }
     return -1;
