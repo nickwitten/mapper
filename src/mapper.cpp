@@ -42,80 +42,77 @@ void Mapper::calibrate_wheel_speed() {
     int samples = 5;
     int32_t prev_speed;
 
-//     // First get robot up to full speed
-//     for (int i = 0; i <= 10; i++) {
-//         _wheel_l.speed(i * 0.1);
-//         wait(0.1);
-//     }
-//     // Slow down by 0.1 pwm increments, waiting
-//     // for speed to be constant, sample speed
-//     // and get average speed to insert into the
-//     // pwm to speed mappings.
-//     for (int i = 10; i >= 0; i--) {
-//         pwm_val = i * 0.1;
-//         _wheel_l.speed(pwm_val);
-//         wait(0.1);
-//         do {
-//             prev_speed = state.lv;
-//             wait(0.1);
-//         } while (abs(state.lv - prev_speed) > 3);
-//         av_vel = 0;
-//         for (int i = 0; i < samples; i++) {
-//             av_vel += state.lv;
-//             wait(0.1);
-//         }
-//         av_vel = av_vel / samples;
-//         // Only add the value if it maintains movement
-//         if (av_vel > 5) {
-//             _pwm_speed_map_l.insert(std::pair<float, int32_t>(pwm_val, av_vel));
-//         }
-//     }
+    // First get robot up to full speed
+    for (int i = 0; i <= 10; i++) {
+        _wheel_l.speed(i * 0.1);
+        wait(0.01);
+    }
+    // Slow down by 0.1 pwm increments, waiting
+    // for speed to be constant, sample speed
+    // and get average speed to insert into the
+    // pwm to speed mappings.
+    for (int i = 10; i >= 0; i--) {
+        pwm_val = i * 0.1;
+        _wheel_l.speed(pwm_val);
+        wait(0.1);
+        do {
+            prev_speed = state.lv;
+            wait(0.1);
+        } while (abs(state.lv - prev_speed) > 3);
+        av_vel = 0;
+        for (int i = 0; i < samples; i++) {
+            av_vel += state.lv;
+            wait(0.1);
+        }
+        av_vel = av_vel / samples;
+        // Only add the value if it maintains movement
+        if (av_vel > 5) {
+            _pwm_speed_map_l.insert(std::pair<float, int32_t>(pwm_val, av_vel));
+        }
+    }
+
+    for (int i = 0; i <= 10; i++) {
+        _wheel_r.speed(i * 0.1);
+        wait(0.01);
+    }
+    // Slow down by 0.1 pwm increments, waiting
+    // for speed to be constant, sample speed
+    // and get average speed to insert into the
+    // pwm to speed mappings.
+    for (int i = 10; i >= 0; i--) {
+        pwm_val = i * 0.1;
+        _wheel_r.speed(pwm_val);
+        wait(0.1);
+        do {
+            prev_speed = state.rv;
+            wait(0.1);
+        } while (abs(state.rv - prev_speed) > 3);
+        av_vel = 0;
+        for (int i = 0; i < samples; i++) {
+            av_vel += state.rv;
+            wait(0.1);
+        }
+        av_vel = av_vel / samples;
+        // Only add the value if it maintains movement
+        if (av_vel > 5) {
+            _pwm_speed_map_r.insert(std::pair<float, int32_t>(pwm_val, av_vel));
+        }
+    }
+
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.4, 150));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.5, 257));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.6, 337));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.7, 372));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.8, 495));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.9, 561));
+//     _pwm_speed_map_l.insert(std::pair<float, int32_t>(1.0, 605));
 // 
-//     for (int i = 0; i <= 10; i++) {
-//         _wheel_r.speed(i * 0.1);
-//         wait(0.1);
-//     }
-//     // Slow down by 0.1 pwm increments, waiting
-//     // for speed to be constant, sample speed
-//     // and get average speed to insert into the
-//     // pwm to speed mappings.
-//     for (int i = 10; i >= 0; i--) {
-//         pwm_val = i * 0.1;
-//         _wheel_r.speed(pwm_val);
-//         wait(0.1);
-//         do {
-//             prev_speed = state.rv;
-//             wait(0.1);
-//         } while (abs(state.rv - prev_speed) > 3);
-//         av_vel = 0;
-//         for (int i = 0; i < samples; i++) {
-//             av_vel += state.rv;
-//             wait(0.1);
-//         }
-//         av_vel = av_vel / samples;
-//         // Only add the value if it maintains movement
-//         if (av_vel > 5) {
-//             _pwm_speed_map_r.insert(std::pair<float, int32_t>(pwm_val, av_vel));
-//         }
-//     }
-
-    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.30, 56));
-    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.40, 106));
-    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.50, 192));
-    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.60, 289));
-    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.70, 356));
-    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.80, 367));
-    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.90, 480));
-    _pwm_speed_map_l.insert(std::pair<float, int32_t>(1.00, 562));
-
-    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.30, 47));
-    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.40, 140));
-    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.50, 237));
-    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.60, 280));
-    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.70, 323));
-    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.80, 453));
-    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.90, 469));
-    _pwm_speed_map_r.insert(std::pair<float, int32_t>(1.00, 553));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.5, 129));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.6, 275));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.7, 349));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.8, 380));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.9, 498));
+//     _pwm_speed_map_r.insert(std::pair<float, int32_t>(1.0, 424));
 
     linearize_map(_pwm_speed_map_l, &_pwm_speed_m_l, &_pwm_speed_b_l);
     linearize_map(_pwm_speed_map_r, &_pwm_speed_m_r, &_pwm_speed_b_r);

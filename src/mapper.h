@@ -6,7 +6,7 @@
 #include "Motor.h"
 #include "VL53L0X.h"
 #include "HALLFX_ENCODER.h"
-#include "pid.h"
+#include "PID.h"
 
 #define MOTOR_PWM_LEFT p22
 #define MOTOR_PWM_RIGHT p21

@@ -29,10 +29,15 @@ int main() {
 
     pc.printf("Calibrated:\r\n");
     std::map<float, int32_t>::iterator itr;
-    for (itr = robot._pwm_speed_map_r.begin(); itr != robot._pwm_speed_map_r.end(); ++itr) {
-        pc.printf("%.2f: %d\r\n", itr->first, itr->second);
+    pc.printf("Left samples:\r\n");
+    for (itr = robot._pwm_speed_map_l.begin(); itr != robot._pwm_speed_map_l.end(); ++itr) {
+        pc.printf("%.1f, %d\r\n", itr->first, itr->second);
     }
-    pc.printf("LEFT:\r\n");
+    pc.printf("Right samples:\r\n");
+    for (itr = robot._pwm_speed_map_r.begin(); itr != robot._pwm_speed_map_r.end(); ++itr) {
+        pc.printf("%.1f, %d\r\n", itr->first, itr->second);
+    }
+    pc.printf("\r\nLEFT:\r\n");
     pc.printf("\t%f (mm/s) / V\r\n", robot._pwm_speed_m_l);
     pc.printf("\t%f mm/s at 0 V\r\n", robot._pwm_speed_b_l);
     pc.printf("RIGHT:\r\n");
