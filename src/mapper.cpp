@@ -126,10 +126,6 @@ void Mapper::start_state_update(float dt) {
 //    _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      50 / M_PI);  // Works well at 200 mm/s
     _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      400 / M_PI);  // Works well at 0 mm/s
     /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
-
-//      /*             dt,  max,  min,         Kp,             Kd,              Ki   */
-//      _pid = new PID(dt,  600, -600, 600 / M_PI,              0,               0);
-//      /*              s, mm/s, mm/s, (mm/s)/rad, (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
 }
 
 void Mapper::update_state() {
@@ -165,6 +161,17 @@ void Mapper::update_state() {
     state = nx;
 }
 
+void Mapper::init_pid(int32_t speed) {
+    if (_pid != NULL) {
+        delete _pid;
+    }
+    if (speed == 0) {
+        _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      400 / M_PI);  // Works well at 0 mm/s
+    } else {
+        _pid = new PID(dt,  800, -800, 800 / M_PI,      20 / M_PI,      50 / M_PI);  // Works well at 200 mm/s
+    }
+}
+
 void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     static int32_t last_speed = 0;  // keep track of a target speed change
     *_lv_diff = 0;  // Initialize change in velocities to 0
@@ -177,6 +184,7 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
         *_rv_diff = target_speed - last_speed;
         _pwm_l = (target_speed != 0) ? (target_speed - _pwm_speed_b_l) / _pwm_speed_m_l : 0;
         _pwm_r = (target_speed != 0) ? (target_speed - _pwm_speed_b_r) / _pwm_speed_m_r : 0;
+        init_pid(target_speed);
         last_speed = target_speed;
     }
     v_off = _pid->calculate((double)target_theta, (double)state.theta);  // Offset in velocities between wheel
