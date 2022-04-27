@@ -166,6 +166,8 @@ void Mapper::update_state() {
     Measurement m = get_measurements();
     State nx;
     nx.theta = state.theta + (_dt * m.rv - _dt * m.lv) / _wheel_sep;
+    if (nx.theta > 2 * M_PI) nx.theta -= (2 * M_PI) * floor(nx.theta / (2 * M_PI));
+    if (nx.theta < 0) nx.theta += (2 * M_PI) * (floor(abs(nx.theta) / (2 * M_PI)) + 1);
     nx.x = state.x + (0.5 * _dt * m.lv + 0.5 * _dt * m.rv) * cos(nx.theta);
     nx.y = state.y + (0.5 * _dt * m.lv + 0.5 * _dt * m.rv) * sin(nx.theta);
     nx.lv = m.lv;
@@ -223,7 +225,17 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
         _init_pid(target_speed);
         last_speed = target_speed;
     }
-    v_off = _pid->calculate((double)target_theta, (double)state.theta);  // Offset in velocities between wheel
+
+    // These are temporary thetas to make the difference in bounds (PI, -PI)
+    float state_theta = state.theta;
+    float targ_theta = target_theta;
+    if ((targ_theta - state_theta) > M_PI) {
+        targ_theta -= 2 * M_PI;
+    } else if ((targ_theta - state_theta) < M_PI) {
+        state_theta -= 2 * M_PI;
+    }
+    v_off = _pid->calculate(targ_theta, state_theta);  // Offset in velocities between wheel
+
     // Left wheel goes faster
     if (v_off < 0 ) {
         // Take all extra speed off right wheel
@@ -266,6 +278,7 @@ State Mapper::fx(State _x) {
     nx.y += (0.5 * _dt * state.lv + 0.5 * _dt * state.rv) * sin(state.theta);
     nx.lv = state.lv;
     nx.rv = state.rv;
+    // TODO: if used theta needs to be kept in [0, 2*PI]
     nx.theta += (_dt * state.rv - _dt * state.lv) / _wheel_sep;
     return nx;
 }
@@ -283,23 +296,33 @@ Measurement Mapper::hx(State _x) {
 int Mapper::plot_object(LIDAR_DIRECTION dir, Point &p) {
     uint32_t dist;
     int status = read_dist(dir, dist);
+    int soff_x;  // Offsets of sensors from center of robot
+    int soff_y;
     if (status == VL53L0X_ERROR_NONE && dist <= _map_thresh_mm) {
         float s_theta = 0;  // Sensor theta
         switch (dir) {
             case CENTER:
                 s_theta = state.theta;
+                soff_x = _soff_x_c;
+                soff_y = _soff_y_c;
                 break;
             case LEFT:
                 s_theta = state.theta + M_PI / 2;
+                soff_x = _soff_x_l;
+                soff_y = _soff_y_l;
                 break;
             case RIGHT:
                 s_theta = state.theta - M_PI / 2;
+                soff_x = _soff_x_r;
+                soff_y = _soff_y_r;
                 break;
             default:
                 error("INVALID LIDAR DIRECTION\r\n");
         };
-        p.x = state.x + cos(s_theta) * dist;
-        p.y = state.y + sin(s_theta) * dist;
+        // p.x = state.x - soff_y * sin(s_theta) + soff_x * cos(s_theta) + dist * cos(s_theta);
+        // p.y = state.y + soff_y * sin(s_theta) + soff_x * cos(s_theta) + dist * sin(s_theta);
+        p.x = state.x + dist * cos(s_theta);
+        p.y = state.y + dist * sin(s_theta);
         return 0;
     }
     return -1;
