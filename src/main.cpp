@@ -1,40 +1,69 @@
 #include "mbed.h"
 #include "mapper.h"
 #include "rtos.h"
+#include <climits>
 
 
 extern Serial pc;
 Mapper robot;
+BusOut leds(LED1, LED2, LED3, LED4);
 
 
 Thread turn_t;
+volatile int d_center;
+volatile int d_left;
+volatile int d_right;
 void turn() {
-    robot.target_speed = 0;
-    float targ_theta = robot.target_theta - M_PI / 2;
-    if (targ_theta < 0) {
-        robot.target_theta = targ_theta + 2 * M_PI;
-    } else {
-        robot.target_theta = targ_theta;
+    while (1) {
+        if (d_center <= 250) {
+            robot.target_speed = 0;
+            float targ_theta;
+            if (d_right == d_left) {
+                leds = 0xF;
+                targ_theta = 0;
+            }
+            if (d_right < d_left) {
+                targ_theta = robot.target_theta - M_PI / 2;
+            } else {
+                targ_theta = robot.target_theta + M_PI / 2;
+            }
+
+            if (targ_theta < 0) {
+                robot.target_theta = targ_theta + 2 * M_PI;
+            } else if (targ_theta > 2 * M_PI) {
+                robot.target_theta = targ_theta - 2 * M_PI;
+            } else {
+                robot.target_theta = targ_theta;
+            }
+
+            Thread::wait(3000);
+            robot.target_speed = 350;
+        }
+        Thread::yield();
     }
-    Thread::wait(3000);
-    robot.target_speed = 350;
 }
 
-// Returns distance to closest object in front of robot in mm
-// if no object then returns -1
-int plot_surrounding() {
+void plot_surrounding() {
     Point measured_point = {0, 0};
-    LIDAR_DIRECTION dirs[3] = {CENTER, LEFT, RIGHT};
-    int d_front = -1;
-    for (auto dir : dirs) {
-        if (!robot.plot_object(dir, measured_point)) {
-            pc.printf("%d, %d\r\n", measured_point.x, measured_point.y);
-            if (dir == CENTER) {
-                d_front = sqrt(pow(measured_point.x - robot.state.x, 2) + pow(measured_point.y - robot.state.y, 2));
-            }
-        }
-    }
-    return d_front;
+    if (!robot.plot_object(CENTER, measured_point)) {
+        pc.printf("%d, %d\r\n", measured_point.x, measured_point.y);
+        d_center = sqrt(pow(measured_point.x - robot.state.x, 2) + pow(measured_point.y - robot.state.y, 2));
+    } else d_center = INT_MAX;
+    if (!robot.plot_object(LEFT, measured_point)) {
+        pc.printf("%d, %d\r\n", measured_point.x, measured_point.y);
+        d_left = sqrt(pow(measured_point.x - robot.state.x, 2) + pow(measured_point.y - robot.state.y, 2));
+    } else d_left = INT_MAX;
+    if (!robot.plot_object(RIGHT, measured_point)) {
+        pc.printf("%d, %d\r\n", measured_point.x, measured_point.y);
+        d_right = sqrt(pow(measured_point.x - robot.state.x, 2) + pow(measured_point.y - robot.state.y, 2));
+    } else d_right = INT_MAX;
+
+    // for (auto dir : dirs) {
+    //     if (!robot.plot_object(dir, measured_point)) {
+    //         pc.printf("%d, %d\r\n", measured_point.x, measured_point.y);
+    //     }
+    // }
+    //
 }
 
 void print_state() {
@@ -75,15 +104,10 @@ int main() {
 
     robot.target_speed = 350;
     // robot.control = false;
+    turn_t.start(Callback<void()>(&turn));
     while (1) {
         print_state();
-        int d_front = plot_surrounding();
-        if (d_front == -1) continue;
-        if (d_front <= 200) {
-            int state = turn_t.get_state();
-            if (state == Thread::Inactive || state == Thread::Deleted) {
-                turn_t.start(Callback<void()>(&turn));
-            }
-        }
+        plot_surrounding();
+        Thread::yield();
     }
 }

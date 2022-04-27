@@ -3,7 +3,6 @@
 
 #include "mapper.h"
 
-BusOut leds(LED1, LED2, LED3, LED4);
 Serial pc(USBTX, USBRX);
 
 // Serial pc(USBTX, USBRX);
