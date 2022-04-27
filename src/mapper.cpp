@@ -231,7 +231,7 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     float targ_theta = target_theta;
     if ((targ_theta - state_theta) > M_PI) {
         targ_theta -= 2 * M_PI;
-    } else if ((targ_theta - state_theta) < M_PI) {
+    } else if ((targ_theta - state_theta) < -M_PI) {
         state_theta -= 2 * M_PI;
     }
     v_off = _pid->calculate(targ_theta, state_theta);  // Offset in velocities between wheel
