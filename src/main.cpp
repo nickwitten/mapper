@@ -10,19 +10,22 @@ BusOut leds(LED1, LED2, LED3, LED4);
 
 
 Thread turn_t;
-volatile int d_center;
-volatile int d_left;
-volatile int d_right;
+volatile int d_center = INT_MAX;
+volatile int d_left = INT_MAX;
+volatile int d_right = INT_MAX;
 void turn() {
     while (1) {
         if (d_center <= 250) {
             robot.target_speed = 0;
             float targ_theta;
             if (d_right == d_left) {
-                leds = 0xF;
-                targ_theta = 0;
-            }
-            if (d_right < d_left) {
+                if (robot.target_theta == 0 || robot.target_theta == M_PI) {
+                    targ_theta = M_PI / 2;
+                } else {
+                    targ_theta = robot.target_theta + M_PI / 2;
+                }
+                leds = ~leds;
+            } else if (d_right > d_left) {
                 targ_theta = robot.target_theta - M_PI / 2;
             } else {
                 targ_theta = robot.target_theta + M_PI / 2;
@@ -102,11 +105,12 @@ int main() {
     pc.printf("Calibrated:\r\n");
     print_cal();
 
+    plot_surrounding();  // Plot once before moving
+    turn_t.start(Callback<void()>(&turn));
     robot.target_speed = 350;
     // robot.control = false;
-    turn_t.start(Callback<void()>(&turn));
     while (1) {
-        print_state();
+        // print_state();
         plot_surrounding();
         Thread::yield();
     }
