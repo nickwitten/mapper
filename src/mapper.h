@@ -118,6 +118,8 @@ public:
     Motor _wheel_r;
     float _pwm_l = 0.0;
     float _pwm_r = 0.0;
+    int _wheel_dir_l = 1;  // 1 for forward, -1 for reverse
+    int _wheel_dir_r = 1;
     HALLFX_ENCODER _encoder_left;
     HALLFX_ENCODER _encoder_right;
     DevI2C _i2c;

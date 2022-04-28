@@ -225,7 +225,7 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
         last_speed = target_speed;
     }
 
-    // These are temporary thetas to make the difference in bounds (PI, -PI)
+    // These are temporary thetas to make the difference in bounds [-PI, PI]
     float state_theta = state.theta;
     float targ_theta = target_theta;
     if ((targ_theta - state_theta) > M_PI) {
@@ -235,23 +235,39 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     }
     _v_off = _pid->calculate(targ_theta, state_theta);  // Offset in velocities between wheel
 
-    // Left wheel goes faster
-    if (_v_off < 0 ) {
-        // Take all extra speed off right wheel
-        *_rv_diff -= _pwm_add_r * _pwm_speed_m_r;
-        _pwm_add_r = 0;
-        // Add extra pwm to left
-        *_lv_diff += abs(_v_off) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
-        _pwm_add_l = (1 / _pwm_speed_m_l) * abs(_v_off);
-    } else {
-        *_lv_diff -= _pwm_add_l * _pwm_speed_m_l;
-        _pwm_add_l = 0;
-        *_rv_diff += abs(_v_off) - (_pwm_add_r * _pwm_speed_m_r);
-        _pwm_add_r = (1 / _pwm_speed_m_r) * abs(_v_off);
-    }
+//     // Left wheel needs to goes faster
+//     if (_v_off < 0 ) {
+//         // Take all extra speed off right wheel
+//         *_rv_diff -= _pwm_add_r * _pwm_speed_m_r;
+//         _pwm_add_r = 0;
+//         // Add extra pwm to left
+//         *_lv_diff += abs(_v_off) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
+//         _pwm_add_l = (1 / _pwm_speed_m_l) * abs(_v_off);
+//     } else {
+//         *_lv_diff -= _pwm_add_l * _pwm_speed_m_l;
+//         _pwm_add_l = 0;
+//         *_rv_diff += abs(_v_off) - (_pwm_add_r * _pwm_speed_m_r);
+//         _pwm_add_r = (1 / _pwm_speed_m_r) * abs(_v_off);
+//     }
+
+    *_rv_diff += (_v_off / 2) - (_pwm_add_r * _pwm_speed_m_r);
+    _pwm_add_r = (1 / _pwm_speed_m_r) * (_v_off / 2);
+    *_lv_diff += (- _v_off / 2) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
+    _pwm_add_l = (1 / _pwm_speed_m_l) * (- _v_off / 2);
+
     // Finally set our pwm
     float pwm_l = _pwm_l + _pwm_add_l;
     float pwm_r = _pwm_r + _pwm_add_r;
+    if (pwm_l < 0.0) {
+        _wheel_dir_l = -1;
+    } else {
+        _wheel_dir_l = 1;
+    }
+    if (pwm_r < 0.0) {
+        _wheel_dir_r = -1;
+    } else {
+        _wheel_dir_r = 1;
+    }
     _wheel_l.speed(pwm_l <= 1.0 ? pwm_l : 1.0);
     _wheel_r.speed(pwm_r <= 1.0 ? pwm_r : 1.0);
 }
@@ -264,8 +280,8 @@ Measurement Mapper::get_measurements() {
     int r_ct = _encoder_right.read();
     float ld = dpc * l_ct; //unit in mm
     float rd = dpc * r_ct; //unit in mm
-    z.lv = ld / _dt;
-    z.rv = rd / _dt;
+    z.lv = ld / _dt * _wheel_dir_l;
+    z.rv = rd / _dt * _wheel_dir_r;
     _encoder_left.reset();
     _encoder_right.reset();
     return z;
