@@ -233,25 +233,25 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     } else if ((targ_theta - state_theta) < -M_PI) {
         state_theta -= 2 * M_PI;
     }
-    v_off = _pid->calculate(targ_theta, state_theta);  // Offset in velocities between wheel
+    _v_off = _pid->calculate(targ_theta, state_theta);  // Offset in velocities between wheel
 
     // Left wheel goes faster
-    if (v_off < 0 ) {
+    if (_v_off < 0 ) {
         // Take all extra speed off right wheel
-        *_rv_diff -= pwm_add_r * _pwm_speed_m_r;
-        pwm_add_r = 0;
+        *_rv_diff -= _pwm_add_r * _pwm_speed_m_r;
+        _pwm_add_r = 0;
         // Add extra pwm to left
-        *_lv_diff += abs(v_off) - (pwm_add_l * _pwm_speed_m_l);  // This could be negative
-        pwm_add_l = (1 / _pwm_speed_m_l) * abs(v_off);
+        *_lv_diff += abs(_v_off) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
+        _pwm_add_l = (1 / _pwm_speed_m_l) * abs(_v_off);
     } else {
-        *_lv_diff -= pwm_add_l * _pwm_speed_m_l;
-        pwm_add_l = 0;
-        *_rv_diff += abs(v_off) - (pwm_add_r * _pwm_speed_m_r);
-        pwm_add_r = (1 / _pwm_speed_m_r) * abs(v_off);
+        *_lv_diff -= _pwm_add_l * _pwm_speed_m_l;
+        _pwm_add_l = 0;
+        *_rv_diff += abs(_v_off) - (_pwm_add_r * _pwm_speed_m_r);
+        _pwm_add_r = (1 / _pwm_speed_m_r) * abs(_v_off);
     }
     // Finally set our pwm
-    float pwm_l = _pwm_l + pwm_add_l;
-    float pwm_r = _pwm_r + pwm_add_r;
+    float pwm_l = _pwm_l + _pwm_add_l;
+    float pwm_r = _pwm_r + _pwm_add_r;
     _wheel_l.speed(pwm_l <= 1.0 ? pwm_l : 1.0);
     _wheel_r.speed(pwm_r <= 1.0 ? pwm_r : 1.0);
 }

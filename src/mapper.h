@@ -102,7 +102,7 @@ public:
     float target_theta = M_PI / 2;
     State state;
     State prev_state;
-    bool control = true;  // Whether the robot tries to correct theta or not
+    bool control = true;  // Whether the robot tries to correct theta and speed
 // private:
     float _dt = 0;  // Time change between updates in seconds
     uint32_t _wheel_sep = 163;  // Separation between center of wheels in mm
@@ -135,9 +135,9 @@ public:
     float _pwm_speed_b_l;
     float _pwm_speed_m_r;
     float _pwm_speed_b_r;
-    int32_t v_off = 0;
-    float pwm_add_l = 0;
-    float pwm_add_r = 0;
+    int32_t _v_off = 0;
+    float _pwm_add_l = 0;
+    float _pwm_add_r = 0;
     void _init_lidar();
     void _init_pid(int32_t speed);
 };

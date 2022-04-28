@@ -73,7 +73,7 @@ void print_state() {
     pc.printf("X: %d, Y: %d, THETA: %.f, TARGET THETA: %.f\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI, robot.target_theta * 180 / M_PI);
     pc.printf("LV: %d, RV: %d\r\n", robot.state.lv, robot.state.rv);
     pc.printf("PWML: %f, PWMR: %f\r\n", robot._pwm_l, robot._pwm_r);
-    pc.printf("VOFF: %d, PWMADDL: %.2f, PWMADDR: %.2f\r\n\r\n", robot.v_off, robot.pwm_add_l, robot.pwm_add_r);
+    pc.printf("VOFF: %d, PWMADDL: %.2f, PWMADDR: %.2f\r\n\r\n", robot._v_off, robot._pwm_add_l, robot._pwm_add_r);
 }
 
 void print_cal() {
