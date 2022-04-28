@@ -98,7 +98,7 @@ void Mapper::calibrate_wheel_speed() {
         }
     }
 
-// Bedroom floor
+// // Bedroom floor
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.4, 150));
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.5, 257));
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.6, 337));
@@ -106,7 +106,7 @@ void Mapper::calibrate_wheel_speed() {
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.8, 495));
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.9, 561));
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(1.0, 605));
-// 
+//
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.5, 129));
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.6, 275));
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.7, 349));
@@ -131,8 +131,8 @@ void Mapper::calibrate_wheel_speed() {
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.8, 354));
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.9, 431));
 //     _pwm_speed_map_r.insert(std::pair<float, int32_t>(1.0, 464));
-// 
-// Study hallway
+//
+// // Study hallway
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.4, 48 ));
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.5, 117));
 //     _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.6, 168));

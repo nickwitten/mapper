@@ -80,29 +80,31 @@ void print_cal() {
     std::map<float, int32_t>::iterator itr;
     pc.printf("Left samples:\r\n");
     for (itr = robot._pwm_speed_map_l.begin(); itr != robot._pwm_speed_map_l.end(); ++itr) {
-        pc.printf("%.1f, %d\r\n", itr->first, itr->second);
+        pc.printf("robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(%.1f, %d));\r\n", itr->first, itr->second);
     }
     pc.printf("Right samples:\r\n");
     for (itr = robot._pwm_speed_map_r.begin(); itr != robot._pwm_speed_map_r.end(); ++itr) {
-        pc.printf("%.1f, %d\r\n", itr->first, itr->second);
+        pc.printf("robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(%.1f, %d));\r\n", itr->first, itr->second);
     }
     pc.printf("\r\nLEFT:\r\n");
     pc.printf("\t%f (mm/s) / V\r\n", robot._pwm_speed_m_l);
     pc.printf("\t%f mm/s at 0 V\r\n", robot._pwm_speed_b_l);
     pc.printf("RIGHT:\r\n");
     pc.printf("\t%f (mm/s) / v\r\n", robot._pwm_speed_m_r);
-    pc.printf("\t%f mm/s at 0 V\r\n", robot._pwm_speed_b_r);
+    pc.printf("\t%f mm/s at 0 V\r\n\r\n", robot._pwm_speed_b_r);
 }
 
 
 int main() {
     robot.start_state_update(0.05);
     robot.control = false;
-    robot.calibrate_wheel_speed();
+    if (1) {
+        robot.calibrate_wheel_speed();
+        pc.printf("Calibrated:\r\n");
+    }
     robot.control = true;
     pc.printf("reset\r\n");
 
-    pc.printf("Calibrated:\r\n");
     print_cal();
 
     plot_surrounding();  // Plot once before moving
