@@ -82,6 +82,14 @@ inline void linearize_map(std::map<float, int32_t> &_map, float *m, float *b) {
     *b = numerator / denominator;
 }
 
+// Bounds theta between 0 and 2*PI
+inline float bound_theta(float theta) {
+    if (theta > 2 * M_PI) theta -= (2 * M_PI) * floor(theta / (2 * M_PI));
+    if (theta < 0) theta += (2 * M_PI) * (floor(abs(theta) / (2 * M_PI)) + 1);
+    return theta;
+}
+
+
 
 class Mapper {
 public:

@@ -164,9 +164,7 @@ void Mapper::update_state() {
     // State will be inacurate if any negative speeds are used!
     Measurement m = get_measurements();
     State nx;
-    nx.theta = state.theta + (_dt * m.rv - _dt * m.lv) / _wheel_sep;
-    if (nx.theta > 2 * M_PI) nx.theta -= (2 * M_PI) * floor(nx.theta / (2 * M_PI));
-    if (nx.theta < 0) nx.theta += (2 * M_PI) * (floor(abs(nx.theta) / (2 * M_PI)) + 1);
+    nx.theta = bound_theta(state.theta + (_dt * m.rv - _dt * m.lv) / _wheel_sep);
     nx.x = state.x + (0.5 * _dt * m.lv + 0.5 * _dt * m.rv) * cos(nx.theta);
     nx.y = state.y + (0.5 * _dt * m.lv + 0.5 * _dt * m.rv) * sin(nx.theta);
     nx.lv = m.lv;
@@ -311,8 +309,8 @@ Measurement Mapper::hx(State _x) {
 int Mapper::plot_object(LIDAR_DIRECTION dir, Point &p) {
     uint32_t dist;
     int status = read_dist(dir, dist);
-    int soff_x;  // Offsets of sensors from center of robot
-    int soff_y;
+    int soff_x = 0;  // Offsets of sensors from center of robot
+    int soff_y = 0;
     if (status == VL53L0X_ERROR_NONE && dist <= _map_thresh_mm) {
         float s_theta = 0;  // Sensor theta
         switch (dir) {
@@ -334,10 +332,10 @@ int Mapper::plot_object(LIDAR_DIRECTION dir, Point &p) {
             default:
                 error("INVALID LIDAR DIRECTION\r\n");
         };
-        // p.x = state.x - soff_y * sin(s_theta) + soff_x * cos(s_theta) + dist * cos(s_theta);
-        // p.y = state.y + soff_y * sin(s_theta) + soff_x * cos(s_theta) + dist * sin(s_theta);
-        p.x = state.x + dist * cos(s_theta);
-        p.y = state.y + dist * sin(s_theta);
+        p.x = state.x + soff_y * cos(state.theta) + soff_x * cos(state.theta - M_PI / 2) + dist * cos(s_theta);
+        p.y = state.y + soff_y * sin(state.theta) + soff_x * sin(state.theta - M_PI / 2) + dist * sin(s_theta);
+        // p.x = state.x + dist * cos(s_theta);
+        // p.y = state.y + dist * sin(s_theta);
         return 0;
     }
     return -1;
