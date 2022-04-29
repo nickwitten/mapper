@@ -218,8 +218,12 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     if (target_speed != last_speed) {
         *_lv_diff = target_speed - last_speed;
         *_rv_diff = target_speed - last_speed;
-        _pwm_l = (target_speed != 0) ? (target_speed - _pwm_speed_b_l) / _pwm_speed_m_l : 0;
-        _pwm_r = (target_speed != 0) ? (target_speed - _pwm_speed_b_r) / _pwm_speed_m_r : 0;
+        _pwm_l = (target_speed != 0) ? (abs(target_speed) - _pwm_speed_b_l) / _pwm_speed_m_l : 0;
+        _pwm_r = (target_speed != 0) ? (abs(target_speed) - _pwm_speed_b_r) / _pwm_speed_m_r : 0;
+        if (target_speed < 0) {
+            _pwm_l = -_pwm_l;
+            _pwm_r = -_pwm_r;
+        }
         _init_pid(target_speed);
         last_speed = target_speed;
     }
@@ -234,7 +238,8 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     }
     _v_off = _pid->calculate(targ_theta, state_theta);  // Offset in velocities between wheel
 
-    if (target_speed > 0) {
+    // Not sure if this works for negative target speeds
+    if (abs(target_speed) > 0) {  // If moving forward only add pwm to base pwm
         // Left wheel needs to goes faster
         if (_v_off < 0 ) {
             // Take all extra speed off right wheel
@@ -249,7 +254,7 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
             *_rv_diff += abs(_v_off) - (_pwm_add_r * _pwm_speed_m_r);
             _pwm_add_r = (1 / _pwm_speed_m_r) * abs(_v_off);
         }
-    } else {
+    } else {  // If stationary, one wheel goes back and the other forward
         *_rv_diff += (_v_off / 2) - (_pwm_add_r * _pwm_speed_m_r);
         _pwm_add_r = (1 / _pwm_speed_m_r) * (_v_off / 2);
         *_lv_diff += (- _v_off / 2) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
