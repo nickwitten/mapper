@@ -95,23 +95,18 @@ class Mapper {
 public:
     Mapper();
     ~Mapper();
+    void init_state();
     void start_state_update(float dt);
-    void update_state();
-    void update_control(int32_t *_lv_diff, int32_t *_rv_diff);
-    void calibrate_wheel_speed();
-    Measurement get_measurements();
-    State fx(State _x);
-    Measurement hx(State _x);
+    void calibrate_left_wheel();
+    void calibrate_right_wheel();
     int plot_object(LIDAR_DIRECTION dir, Point &p);
     int read_dist(LIDAR_DIRECTION dir, uint32_t &dist);
-    int32_t x = 0;  // X coordinate relative to start in millimiters
-    int32_t y = 0;  // Y coordinate relative to start in millimiters
+    // Use these variables to control the robot
     int32_t target_speed = 0;  // Speed in mm/s, this is a target speed that is not corrected
     float target_theta = M_PI / 2;
     State state;
-    State prev_state;
     bool control = true;  // Whether the robot tries to correct theta and speed
-// private:
+private:
     float _dt = 0;  // Time change between updates in seconds
     uint32_t _wheel_sep = 163;  // Separation between center of wheels in mm
     float _wheel_circ = 230.0;  // Wheel circumference in mm
@@ -148,8 +143,12 @@ public:
     int32_t _v_off = 0;
     float _pwm_add_l = 0;
     float _pwm_add_r = 0;
+
+    void _update_state();
+    void _update_control(int32_t *_lv_diff, int32_t *_rv_diff);
     void _init_lidar();
     void _init_pid(int32_t speed);
+    Measurement _get_measurements();
 };
 
 #endif

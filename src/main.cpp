@@ -36,19 +36,32 @@ void plot_surrounding() {
 Thread auto_t;;
 void autonomous() {
     int move_speed = 150;
+    int stuck_ct = 0;  // Amount of time spent at 0 mm/s
+    bool force_turn = false;  // If stuck we need to force the turn
+    int16_t loop_ct = 0;  // for leds
     while (!pc_mutex.trylock()) Thread::yield();
     pc.printf("Autonomous commands starting\r\n");
     pc_mutex.unlock();
     while (1) {
+        leds = 1 << ((int)floor(loop_ct++ / 10) % 4);
         robot.target_speed = move_speed;
-        if (d_center <= 300) {
-            robot.target_speed = -10;
+        if (!robot.state.lv && !robot.state.rv) {
+            if (++stuck_ct >= 200) {  // at least two seconds
+                force_turn = true;
+                stuck_ct = 0;
+            }
+        }
+        // robot needs to turn if too close to an object
+        if (d_center <= 300 || d_right <= 200 || d_left <=200 || force_turn) {
+            leds = 0xF;
+            robot.target_speed = -10;  // stop
             Thread::wait(50);
             robot.target_speed = 0;
+            // Find the direction with the most empty space and turn to it
             float targ_theta;
             if (d_right == d_left) {
                 if (robot.target_theta == 0 || robot.target_theta == M_PI) {
-                    targ_theta = M_PI / 2;
+                    targ_theta = M_PI / 2;  // Try to keep moving in +y direction
                 } else {
                     targ_theta = robot.target_theta + M_PI / 2;
                 }
@@ -59,6 +72,7 @@ void autonomous() {
             }
             robot.target_theta = bound_theta(targ_theta);
 
+            force_turn = false;
             Thread::wait(3000);
         } else {
             Thread::wait(10);
@@ -70,8 +84,8 @@ void print_state() {
     while (!pc_mutex.trylock()) Thread::yield();
     pc.printf("X: %d, Y: %d, THETA: %.f, TARGET THETA: %.f, TARGET SPEED: %d\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI, robot.target_theta * 180 / M_PI, robot.target_speed);
     pc.printf("LV: %d, RV: %d\r\n", robot.state.lv, robot.state.rv);
-    pc.printf("PWML: %f, PWMR: %f\r\n", robot._pwm_l, robot._pwm_r);
-    pc.printf("VOFF: %d, PWMADDL: %.2f, PWMADDR: %.2f\r\n\r\n", robot._v_off, robot._pwm_add_l, robot._pwm_add_r);
+    // pc.printf("PWML: %f, PWMR: %f\r\n", robot._pwm_l, robot._pwm_r);
+    // pc.printf("VOFF: %d, PWMADDL: %.2f, PWMADDR: %.2f\r\n\r\n", robot._v_off, robot._pwm_add_l, robot._pwm_add_r);
     pc_mutex.unlock();
 }
 
@@ -151,6 +165,9 @@ void dispatch() {
             case 'a':
                 toggle_automation();
                 break;
+            case 'r':  // Reset
+                robot.init_state();
+                robot.print_state();
             default:
                 break;
         }
@@ -175,21 +192,31 @@ int main() {
     robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.8, 295));
     robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.9, 298));
     robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(1.0, 308));
+
     linearize_map(robot._pwm_speed_map_l, &robot._pwm_speed_m_l, &robot._pwm_speed_b_l);
     linearize_map(robot._pwm_speed_map_r, &robot._pwm_speed_m_r, &robot._pwm_speed_b_r);
+
     pc.printf("reset\r\n");
     robot.start_state_update(0.05);
 
-#ifdef DEFAULT_AUTO
-    auto_t.start(Callback<void()>(&autonomous));
-#endif
-
-    if (0) {
+    while (pc.readable()) pc.getc();
+    pc.printf("Calibrate? [y,n]\r\n");
+    if (pc.getc() == 'y') {
         robot.control = false;
-        robot.calibrate_wheel_speed();
+        pc.printf("Press any key to calibrate the left wheel\r\n");
+        pc.getc();
+        robot.calibrate_left_wheel();
+        print_cal();
+        while (pc.readable()) pc.getc();
+        pc.printf("Press any key to calibrate the right wheel\r\n");
+        pc.getc();
+        robot.calibrate_right_wheel();
         print_cal();
         robot.control = true;
     }
+#ifdef DEFAULT_AUTO
+    auto_t.start(Callback<void()>(&autonomous));
+#endif
     robot.control = true;
     while (1) {
         dispatch();
