@@ -199,7 +199,8 @@ void Mapper::_init_pid(int32_t speed) {
     }
     if (speed == 0) {
         /*              s, mm/s, mm/s, (mm/s)/rad  , (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
-        _pid = new PID(_dt,  800, -800,   800 / M_PI,    20 / M_PI  ,    400 /  M_PI);  // Works well at 0 mm/s
+        // _pid = new PID(_dt,  800, -800,   800 / M_PI,    20 / M_PI  ,    400 /  M_PI);  // Works well at 0 mm/s
+        _pid = new PID(_dt,  1600, -1600,   10000 / M_PI,    100 / M_PI  ,    50 /  M_PI);  // Works well at 0 mm/s with differential offsets
     } else if (speed < 100) {
         _pid = new PID(_dt,  800, -800, 1000 / M_PI,      100 / M_PI,      50 / M_PI);  // Works well at 50 mm/s (works as if at 0 mm/s)
     } else {
@@ -233,25 +234,27 @@ void Mapper::update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
     }
     _v_off = _pid->calculate(targ_theta, state_theta);  // Offset in velocities between wheel
 
-//     // Left wheel needs to goes faster
-//     if (_v_off < 0 ) {
-//         // Take all extra speed off right wheel
-//         *_rv_diff -= _pwm_add_r * _pwm_speed_m_r;
-//         _pwm_add_r = 0;
-//         // Add extra pwm to left
-//         *_lv_diff += abs(_v_off) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
-//         _pwm_add_l = (1 / _pwm_speed_m_l) * abs(_v_off);
-//     } else {
-//         *_lv_diff -= _pwm_add_l * _pwm_speed_m_l;
-//         _pwm_add_l = 0;
-//         *_rv_diff += abs(_v_off) - (_pwm_add_r * _pwm_speed_m_r);
-//         _pwm_add_r = (1 / _pwm_speed_m_r) * abs(_v_off);
-//     }
-
-    *_rv_diff += (_v_off / 2) - (_pwm_add_r * _pwm_speed_m_r);
-    _pwm_add_r = (1 / _pwm_speed_m_r) * (_v_off / 2);
-    *_lv_diff += (- _v_off / 2) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
-    _pwm_add_l = (1 / _pwm_speed_m_l) * (- _v_off / 2);
+    if (target_speed > 0) {
+        // Left wheel needs to goes faster
+        if (_v_off < 0 ) {
+            // Take all extra speed off right wheel
+            *_rv_diff -= _pwm_add_r * _pwm_speed_m_r;
+            _pwm_add_r = 0;
+            // Add extra pwm to left
+            *_lv_diff += abs(_v_off) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
+            _pwm_add_l = (1 / _pwm_speed_m_l) * abs(_v_off);
+        } else {
+            *_lv_diff -= _pwm_add_l * _pwm_speed_m_l;
+            _pwm_add_l = 0;
+            *_rv_diff += abs(_v_off) - (_pwm_add_r * _pwm_speed_m_r);
+            _pwm_add_r = (1 / _pwm_speed_m_r) * abs(_v_off);
+        }
+    } else {
+        *_rv_diff += (_v_off / 2) - (_pwm_add_r * _pwm_speed_m_r);
+        _pwm_add_r = (1 / _pwm_speed_m_r) * (_v_off / 2);
+        *_lv_diff += (- _v_off / 2) - (_pwm_add_l * _pwm_speed_m_l);  // This could be negative
+        _pwm_add_l = (1 / _pwm_speed_m_l) * (- _v_off / 2);
+    }
 
     // Finally set our pwm
     float pwm_l = _pwm_l + _pwm_add_l;

@@ -35,7 +35,7 @@ void plot_surrounding() {
 }
 
 void print_state() {
-    pc.printf("X: %d, Y: %d, THETA: %.f, TARGET THETA: %.f\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI, robot.target_theta * 180 / M_PI);
+    pc.printf("X: %d, Y: %d, THETA: %.f, TARGET THETA: %.f, TARGET SPEED: %d\r\n", robot.state.x, robot.state.y, robot.state.theta * 180 / M_PI, robot.target_theta * 180 / M_PI, robot.target_speed);
     pc.printf("LV: %d, RV: %d\r\n", robot.state.lv, robot.state.rv);
     pc.printf("PWML: %f, PWMR: %f\r\n", robot._pwm_l, robot._pwm_r);
     pc.printf("VOFF: %d, PWMADDL: %.2f, PWMADDR: %.2f\r\n\r\n", robot._v_off, robot._pwm_add_l, robot._pwm_add_r);
@@ -85,20 +85,17 @@ void dispatch() {
             case 'p':
                 print_state();
                 break;
-            case 24:  // up arrow
+            case 'k':
                 forward();
-            case 25:  // back arrow
-                stop();
-            case 26:  // right arrow
-                turn_left();
                 break;
-            case 27:  // left arrow
+            case 'j':
+                stop();
+                break;
+            case 'l':
                 turn_right();
                 break;
-            case 'c':
-                robot.control = false;
-                robot.calibrate_wheel_speed();
-                print_cal();
+            case 'h':
+                turn_left();
                 break;
             default:
                 break;
@@ -108,10 +105,34 @@ void dispatch() {
 
 
 int main() {
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.1, 17));
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.3, 40));
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.4, 78));
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.5, 145));
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.6, 188));
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.7, 290));
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.8, 337));
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.9, 388));
+    robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(1.0, 403));
+    robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.5, 68));
+    robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.6, 211));
+    robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.7, 280));
+    robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.8, 295));
+    robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.9, 298));
+    robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(1.0, 308));
+    linearize_map(robot._pwm_speed_map_l, &robot._pwm_speed_m_l, &robot._pwm_speed_b_l);
+    linearize_map(robot._pwm_speed_map_r, &robot._pwm_speed_m_r, &robot._pwm_speed_b_r);
+
     robot.start_state_update(0.05);
     robot.control = true;
     pc.printf("reset\r\n");
     pc.attach(Callback<void()>(dispatch));
+    if (0) {
+        robot.control = false;
+        robot.calibrate_wheel_speed();
+        print_cal();
+        robot.control = true;
+    }
     while (1) {
         // print_state();
         // plot_surrounding();
