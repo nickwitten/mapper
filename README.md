@@ -77,13 +77,20 @@ The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dua
 ![Automonus_Mode_Flow_Chart](https://user-images.githubusercontent.com/64867842/166316527-de09a802-df6c-48b6-8c22-c4eb831cb8b8.jpg)
 
 
-## Photos/Videos:
-Robot Front View:
+## Photos:
+### Robot Front View:
+
 ![image](https://user-images.githubusercontent.com/103451305/166268167-431d8e7a-00c7-478a-a439-cd10e1d252b3.jpeg)
-Robot Top View:
+
+### Robot Top View:
+
 ![image](https://user-images.githubusercontent.com/103451305/166268255-cac2833a-e02a-4056-81dd-a8b20729ecb8.jpeg)
-Robot Motor and Encoder:
+
+### Robot Motor and Encoder:
 ![image](https://user-images.githubusercontent.com/103451305/166268281-64000073-e4c9-41c7-bfc8-bb1114eec288.jpeg)
+
+## Videos:
+[![5d426e33601fc5a9d46645a86f8db33](https://user-images.githubusercontent.com/64867842/166330112-a8ef231e-3e2b-4b0d-a220-d8afc62608e4.png)](https://www.youtube.com/watch?v=H9ovxw3yx7E&ab_channel=ZouSicheng)
 
 
 
