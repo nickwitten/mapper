@@ -122,7 +122,7 @@ private:
     float _wheel_circ = 230.0;  // Wheel circumference in mm
     float _encoder_cpr = 360.0;  // Encoder count per rotation
     int32_t _soff_x_l = -65;  // Offset of sensors from center of robot in mm
-    int32_t _soff_y_l = 40;  // Offset of sensors from center of robot in mm
+    int32_t _soff_y_l = 40;
     int32_t _soff_x_c = 0;
     int32_t _soff_y_c = 80;
     int32_t _soff_x_r = 65;

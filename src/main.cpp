@@ -58,7 +58,7 @@ void autonomous() {
             robot.target_speed = 0;
             // Find the direction with the most empty space and turn to it
             float targ_theta;
-            if (d_right == d_left) {
+            if (d_right == d_left || (d_right > 200 && d_left > 200)) {
                 if (robot.target_theta == 0 || robot.target_theta == M_PI) {
                     targ_theta = M_PI / 2;  // Try to keep moving in +y direction
                 } else {
@@ -148,21 +148,25 @@ void dispatch() {
     while (pi.readable()) {
         char IN = pi.getc();
         switch (IN) {
-            case 13:  // enter key
+            case 13:  // Enter key
                 print_state();
                 break;
+            case 65:  // Up key
             case 'k':
                 forward();
                 print_state();
                 break;
+            case 66:  // Down key
             case 'j':
                 stop();
                 print_state();
                 break;
+            case 67:  // Right key
             case 'l':
                 turn_right();
                 print_state();
                 break;
+            case 68:  // Left key
             case 'h':
                 turn_left();
                 print_state();
