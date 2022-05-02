@@ -70,6 +70,10 @@ The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dua
 ## Controller State Diagram:
 ![flow_chart_mapper](https://user-images.githubusercontent.com/64867842/166290131-8ed56b9a-3980-4f2d-981d-875d3332afb2.jpg)
 
+## Autonomous Mode State Diagram:
+![Automonus_Mode_Flow_Chart](https://user-images.githubusercontent.com/64867842/166316527-de09a802-df6c-48b6-8c22-c4eb831cb8b8.jpg)
+
+
 ## Photos/Videos:
 Robot Front View:
 ![image](https://user-images.githubusercontent.com/103451305/166268167-431d8e7a-00c7-478a-a439-cd10e1d252b3.jpeg)
