@@ -56,13 +56,20 @@ void autonomous() {
             robot.target_speed = -10;  // stop
             Thread::wait(50);
             robot.target_speed = 0;
+            Thread::wait(450);
             // Find the direction with the most empty space and turn to it
             float targ_theta;
-            if (d_right == d_left || (d_right > 200 && d_left > 200)) {
-                if (robot.target_theta == 0 || robot.target_theta == M_PI) {
+            if ((d_right == d_left) || (d_right > 200 && d_left > 200)) {
+                pi.printf("R: %d, L: %d, T: %.1f\r\n", d_right, d_left, robot.target_theta);
+                if (robot.target_theta <= (float)M_PI && robot.target_theta != (float)(M_PI / 2.0)) {
+                    pi.printf("Turn right\r\n");
                     targ_theta = M_PI / 2;  // Try to keep moving in +y direction
                 } else {
-                    targ_theta = robot.target_theta + M_PI / 2;
+                    if (d_right > d_left) {
+                        targ_theta = robot.target_theta - M_PI / 2;
+                    } else {
+                        targ_theta = robot.target_theta + M_PI / 2;
+                    }
                 }
             } else if (d_right > d_left) {
                 targ_theta = robot.target_theta - M_PI / 2;
