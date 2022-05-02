@@ -18,16 +18,16 @@ The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dua
 
 ## Part List:
 
-    mbed LPC1768 (https://www.sparkfun.com/products/9564)
-    Shadow Bot Chassis: (https://www.sparkfun.com/products/13301)
-    SparkFun Motor Driver - Dual TB6612FNG (with Headers) (https://www.sparkfun.com/products/14450)
-    Hobby Gearmotor - 140 RPM (Pair) (https://www.sparkfun.com/products/13302)
-    2x Wheels (https://www.sparkfun.com/products/13259)
-    3x VL53L0X ToF Sensor (https://www.adafruit.com/product/3317)
-    2x Wheel Encoder Kit (https://www.sparkfun.com/products/12629)
-    5V Battery Pack (https://www.sparkfun.com/products/9835)
-    DC Barrel Jack Adapter (https://www.sparkfun.com/products/10811)
-    Raspberry Pi Zero W (https://www.sparkfun.com/products/14277)
+   [mbed LPC1768](https://www.sparkfun.com/products/9564)  
+   [Shadow Bot Chassis](https://www.sparkfun.com/products/13301)  
+   [SparkFun Motor Driver - Dual TB6612FNG (with Headers)](https://www.sparkfun.com/products/14450)  
+   [Hobby Gearmotor - 140 RPM (Pair)](https://www.sparkfun.com/products/13302)  
+   [2x Wheels](https://www.sparkfun.com/products/13259)  
+   [3x VL53L0X ToF Sensor](https://www.adafruit.com/product/3317)  
+   [2x Wheel Encoder Kit ](https://www.sparkfun.com/products/12629)  
+   [5V Battery Pack](https://www.sparkfun.com/products/9835)  
+   [DC Barrel Jack Adapter](https://www.sparkfun.com/products/10811)  
+   [Raspberry Pi Zero W](https://www.sparkfun.com/products/14277)  
     
 ## Schematic:
 
