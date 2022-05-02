@@ -216,6 +216,8 @@ void Mapper::_init_pid(int32_t speed) {
     if (speed == 0) {
         /*               s,  mm/s,  mm/s,  (mm/s)/rad  , (mm/s)/(rad/s),  (mm/s)/(rad*s)   */
         _pid = new PID(_dt,  1500, -1500,   1750 / M_PI,    75 / M_PI  ,     50 /  M_PI);  // Works well at 0 mm/s with differential offsets
+        // _pid = new PID(_dt,  800, -800,   800 / M_PI,    20 / M_PI  ,    400 /  M_PI);  // Works well at 0 mm/s
+
     } else if (speed < 100) {
         _pid = new PID(_dt,  1000, -1000,    500 / M_PI,   100 / M_PI  ,     50 / M_PI);  // Works well at 50 mm/s (good for turning while moving forward)
     } else {

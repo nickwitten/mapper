@@ -35,7 +35,7 @@ void plot_surrounding() {
 
 Thread auto_t;;
 void autonomous() {
-    int move_speed = 150;
+    int move_speed = 100;
     int stuck_ct = 0;  // Amount of time spent at 0 mm/s
     bool force_turn = false;  // If stuck we need to force the turn
     int16_t loop_ct = 0;  // for leds
@@ -52,7 +52,7 @@ void autonomous() {
             }
         }
         // robot needs to turn if too close to an object
-        if (d_center <= 300 || d_right <= 200 || d_left <=200 || force_turn) {
+        if (d_center <= 275 || d_right <= 75 || d_left <= 75 || force_turn) {
             leds = 0xF;
             robot.target_speed = -10;  // stop
             Thread::wait(50);
@@ -106,6 +106,12 @@ void print_cal() {
     pc.printf("RIGHT:\r\n");
     pc.printf("\t%f (mm/s) / v\r\n", robot._pwm_speed_m_r);
     pc.printf("\t%f mm/s at 0 V\r\n\r\n", robot._pwm_speed_b_r);
+    pc_mutex.unlock();
+}
+
+void restart_map() {
+    while (!pc_mutex.trylock()) Thread::yield();
+    pc.printf("reset\r\n");
     pc_mutex.unlock();
 }
 
@@ -166,8 +172,11 @@ void dispatch() {
                 toggle_automation();
                 break;
             case 'r':  // Reset
+                robot.target_speed = 0;
+                robot.target_theta = M_PI / 2;
                 robot.init_state();
-                robot.print_state();
+                restart_map();
+                print_state();
             default:
                 break;
         }
@@ -196,7 +205,7 @@ int main() {
     linearize_map(robot._pwm_speed_map_l, &robot._pwm_speed_m_l, &robot._pwm_speed_b_l);
     linearize_map(robot._pwm_speed_map_r, &robot._pwm_speed_m_r, &robot._pwm_speed_b_r);
 
-    pc.printf("reset\r\n");
+    restart_map();
     robot.start_state_update(0.05);
 
     while (pc.readable()) pc.getc();
