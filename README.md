@@ -90,7 +90,12 @@ The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dua
 ![image](https://user-images.githubusercontent.com/103451305/166268281-64000073-e4c9-41c7-bfc8-bb1114eec288.jpeg)
 
 ## Videos:
+
+### Automatic Mapping Demo:
 [![5d426e33601fc5a9d46645a86f8db33](https://user-images.githubusercontent.com/64867842/166330112-a8ef231e-3e2b-4b0d-a220-d8afc62608e4.png)](https://www.youtube.com/watch?v=H9ovxw3yx7E&ab_channel=ZouSicheng)
+
+### Remote Control Mapping Demo:
+[![0ea3cb7534f60492225665e88f2c3e7](https://user-images.githubusercontent.com/64867842/166330598-6b51ec51-b8f4-447f-ba78-00ca33d45f72.png)](https://www.youtube.com/watch?v=4T7IN5BH2GQ&ab_channel=ZouSicheng)
 
 
 
