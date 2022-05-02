@@ -9,7 +9,7 @@ PC_PROJECT_DIR = "C:/Users/nwitt/workspace/mapper/"
 PI_PROJECT_DIR = "/home/pi/workspace/mapper/"
 DATA_DIR = "plot_data/"
 DATA_NAME = "points.pkl"
-PI_IP = "128.61.66.118"
+PI_IP = "128.61.74.255"
 
 while True:
     ret = subprocess.run(["scp", f'pi@{PI_IP}:{PI_PROJECT_DIR}{DATA_DIR}{DATA_NAME}', f'{PC_PROJECT_DIR}{DATA_DIR}{DATA_NAME}'], capture_output=True)
@@ -22,6 +22,9 @@ while True:
         points = pkl.load(f)
 
     plt.clf()
+    if points.size == 0:
+        plt.pause(0.05)
+        continue
     maxes = np.max(points, axis=0)
     xlim = (maxes[0] // 1000) * 1000 + 1000
     ylim = (maxes[1] // 1000) * 1000 + 1000
