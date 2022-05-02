@@ -3,9 +3,6 @@
 
 #include "mapper.h"
 
-Serial pc(USBTX, USBRX);
-
-// Serial pc(USBTX, USBRX);
 
 Mapper::Mapper():
 _wheel_l(MOTOR_PWM_LEFT, MOTOR_FWD_LEFT, MOTOR_REV_LEFT),
