@@ -16,6 +16,31 @@ The project is to create a room mapping robot. The purpose of the robot is to au
 
 The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dual H-Bridge driver module are used to maneuver the robot; 3 LIDAR sensors are used to measure distances while the robot is moving. The whole system is based on the Mbed LPC1768 running Mbed RTOS. In addition, a raspberry pi is used for data manipulation in Python. The robot is also able to flash code wirelessly using wireless connection on raspberry pi and communication between raspberry pi and Mbed. 
 
+## Software:
+
+The virtual COM port is used to control the Mapper through the Raspberry Pi.  Make sure the Pi has internet connection, use SSH to obtain a terminal.  Clone this repository, and use gcc-arm-none-eabi compiler to build the MBED source code.  A USB micro type B to a USB mini type B cable should be used to connect the Raspberry Pi to the MBED.  To flash the binary file, copy it to /media/pi/MBED.  The two python scripts are to be run on the Pi and a personal PC, not connected to the Pi.
+
+## Usage:
+
+To control the robot, open the serial port to the MBED from the Pi.  This can be done with the following commands:
+
+    pip install pyserial
+    python -m serial.tools.miniterm /media/pi/MBED 9600
+
+The following commands can be issued over the serial port
+
+    Arrow Up:    Speed Up
+    Arrow Downs: Slow Down
+    Arrow Left:  Turn Counterclockwise 90 Degrees
+    Arrow Right: Turn Clockwise 90 Degrees
+    r:           Reset State and Map
+    a:           Toggle Autonomous Mode
+    Enter:       Print Mapper State
+    
+The two python scripts can be used to enable plotting.  pi_saver.py should be run on the Pi and pc_plotter.py should be run on a PC.  Commands
+can still be issued while running the pi_saver.py script, but they should typed into the script STDIN and enter must be issued after every
+keypress so they can be passed through to the MBED.  Make sure the Pi's IP address is updated in the pc_plotter.py script.
+
 ## Part List:
 
    [mbed LPC1768](https://www.sparkfun.com/products/9564)  
