@@ -175,8 +175,6 @@ void dispatch() {
                 toggle_automation();
                 break;
             case 'r':  // Reset
-                robot.target_speed = 0;
-                robot.target_theta = M_PI / 2;
                 robot.init_state();
                 restart_map();
                 print_state();

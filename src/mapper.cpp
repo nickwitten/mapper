@@ -167,16 +167,18 @@ void Mapper::calibrate_right_wheel() {
 }
 
 void Mapper::init_state() {
+    target_speed = 0;
+    target_theta = M_PI / 2;
     state.x = 0;
     state.y = 0;
-    state.lv = 0;
-    state.rv = 0;
-    state.theta = M_PI / 2;
+    state.lv = target_speed;
+    state.rv = target_speed;
+    state.theta = target_theta;
+    _init_pid(target_speed);
 }
 
 void Mapper::start_state_update(float dt) {
     _dt = dt;
-    _init_pid(target_speed);
     init_state();
     _update_poll.attach<Mapper, void(Mapper::*)()>(this, &Mapper::_update_state, _dt);
 }
@@ -232,7 +234,8 @@ void Mapper::_update_control(int32_t *_lv_diff, int32_t *_rv_diff) {
         }
         _init_pid(target_speed);  // Maybe don't need to reset PID anymore
                                   // Initially because of different PIDs for
-                                  // different speeds.
+                                  // different speeds.  Just doing it now to
+                                  // clear the integral.
         last_speed = target_speed;
     }
 
