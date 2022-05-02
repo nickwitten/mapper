@@ -67,7 +67,6 @@ Encoders:
     p11            WHITE
     p12                           WHITE
 
-Source Codes:
 
 Photos/Videos:
 Robot Front View:
