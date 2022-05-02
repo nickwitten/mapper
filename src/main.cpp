@@ -51,7 +51,7 @@ void autonomous() {
             }
         }
         // robot needs to turn if too close to an object
-        if (d_center <= 275 || d_right <= 75 || d_left <= 75 || force_turn) {
+        if (d_center <= 275 || d_right <= 0 || d_left <= 0 || force_turn) {
             leds = 0xF;
             robot.target_speed = -10;  // stop
             Thread::wait(50);
@@ -192,7 +192,7 @@ void dispatch() {
 }
 
 int main() {
-    //Left samples:
+    // Left samples:
     robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.1, 17));
     robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.2, 58));
     robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.3, 40));
@@ -203,7 +203,7 @@ int main() {
     robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.8, 337));
     robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(0.9, 388));
     robot._pwm_speed_map_l.insert(std::pair<float, int32_t>(1.0, 403));
-    //Right samples:
+    // Right samples:
     robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.3, 40));
     robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.4, 183));
     robot._pwm_speed_map_r.insert(std::pair<float, int32_t>(0.5, 68));
