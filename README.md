@@ -59,7 +59,7 @@ LIDAR Sensors:
     p25                          SHDN
     p26                                      SHDN
 
-Encoders:
+##Encoders:
 
     Mbed LPC1768   Encoder_Left   Encoder_Right
     VOUT           RED            RED
@@ -67,8 +67,10 @@ Encoders:
     p11            WHITE
     p12                           WHITE
 
+##Controller State Diagram:
+![flow_chart_mapper](https://user-images.githubusercontent.com/64867842/166290131-8ed56b9a-3980-4f2d-981d-875d3332afb2.jpg)
 
-Photos/Videos:
+##Photos/Videos:
 Robot Front View:
 ![image](https://user-images.githubusercontent.com/103451305/166268167-431d8e7a-00c7-478a-a439-cd10e1d252b3.jpeg)
 Robot Top View:
