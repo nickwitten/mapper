@@ -33,39 +33,42 @@ The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dua
 
 ### Motor Drivers and Dual Motors:
 
-    Mbed LPC1768   Motor Driver   Motor_Left  Motor_Right
-    VOUT           VCC
-    GND            GND
-                   VM (to Power)
-                   A01            RED
-                   A02            BLACK
-                   B01                        RED
-                   B02                        BLACK
-    p21            PWMA
-    p22            PMWB
-    p6             AI1
-    p7             BI1
-    p5             AI2
-    p8             BI2
+   | Mbed LPC1768  | Motor Driver |  Motor_Left | Motor_Right |
+   | :---: | :---: | :---: | :---: |
+   | VOUT         |  VCC |
+   | GND          |  GND |
+   |              | VM (to Power) |
+   |            |  A01     |       RED |
+   |            |   A02     |       BLACK |
+   |            |   B01      |          |       RED |
+   |            |    B02      |          |       BLACK |
+   | p21        |    PWMA |
+   | p22        |    PMWB |
+   | p6         |    AI1  |
+   | p7         |    BI1  |
+   | p5         |    AI2  |
+   | p8         |    BI2  |
 
 ### LIDAR Sensors:
 
-    Mbed LPC1768   LIDAR_Right   LIDAR_Left   LIDAR_Center
-    VOUT           VIN           VIN          VIN
-    GND            GND           GND          GND
-    p28            SDA           SDA          SDA
-    p27            SCL           SCL          SCL
-    p24            SHDN      
-    p25                          SHDN
-    p26                                      SHDN
+   | Mbed LPC1768 | LIDAR_Right  | LIDAR_Left  | LIDAR_Center |
+   | :---: | :---: | :---: | :---: |
+   | VOUT         | VIN          | VIN          | VIN |
+   | GND          |  GND         |  GND        |  GND |
+   | p28          |  SDA         |  SDA        |  SDA|
+   | p27          |  SCL       |    SCL       |   SCL|
+   | p24          |  SHDN      |
+   | p25          |             |   SHDN |
+   | p26          |             |            | SHDN |
 
 ### Encoders:
 
-    Mbed LPC1768   Encoder_Left   Encoder_Right
-    VOUT           RED            RED
-    GND            BLACK          BLACK
-    p11            WHITE
-    p12                           WHITE
+   | Mbed LPC1768 |   Encoder_Left |  Encoder_Right |
+   | :---: | :---: | :---: |
+   | VOUT      |     RED         |   RED |
+   | GND        |    BLACK       |   BLACK |
+   | p11        |    WHITE |
+   | p12         | |                  WHITE |
 
 ## Controller State Diagram:
 ![flow_chart_mapper](https://user-images.githubusercontent.com/64867842/166290131-8ed56b9a-3980-4f2d-981d-875d3332afb2.jpg)
