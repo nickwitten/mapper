@@ -10,11 +10,11 @@ This is a final team-based project for Georgia Tech's ECE 4180 Embedded System D
     
 ## Overview
 
-The project is to create a room mapping robot. The purpose of the robot is to autonomously roam a room and plot the 2D coordinates of walls and obstacles while expanding its knowledge in a frontier-based fashion.
+The goal of the project is to create a robot that autonomously roams a room and plots the 2D coordinates of walls and obstacles while expanding its knowledge in a frontier-based fashion.
 
 ## Design Description
 
-The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dual H-Bridge driver module are used to maneuver the robot; 3 LIDAR sensors are used to measure distances while the robot is moving. The whole system is based on the Mbed LPC1768 running Mbed RTOS. In addition, a raspberry pi is used for data manipulation in Python. The robot is also able to flash code wirelessly using wireless connection on raspberry pi and communication between raspberry pi and Mbed. 
+The shadow bot chassis is used as the frame of the robot, 2 DC motors with a dual H-Bridge driver module are used to maneuver the robot, and 3 LIDAR sensors are used to measure distances while the robot is moving. The whole system is based on the Mbed LPC1768 running Mbed RTOS. In addition, a raspberry pi is used to send control commands and for data manipulation in Python. The robot is able to flash code wirelessly using the ssh protocol on the raspberry pi and serial communication between the raspberry pi and Mbed. 
 
 ## Hardware Systems
 ![image](https://user-images.githubusercontent.com/59176907/166589332-684a14d0-5920-4d25-ae13-304ae478fbdf.png)
@@ -28,7 +28,7 @@ Autonomous Mode State Diagram
 
 ## Software Setup
 
-The virtual COM port is used to control the Mapper through the Raspberry Pi.  Make sure the Pi has internet connection, use SSH to obtain a terminal.  Clone this repository, and use gcc-arm-none-eabi compiler to build the MBED source code.  A USB micro type B to a USB mini type B cable should be used to connect the Raspberry Pi to the MBED.  To flash the binary file, copy it to /media/pi/MBED.  The two python scripts are to be run on the Pi and a personal PC, not connected to the Pi.  Make sure the project paths and Pi IP address is updated in the python scripts.
+The virtual COM port is used to control the Mapper through the Raspberry Pi.  Make sure the Pi has internet connection, use SSH to obtain a terminal.  Clone this repository, and use gcc-arm-none-eabi compiler to build the MBED source code.  A USB micro type B to a USB mini type B cable should be used to connect the Raspberry Pi to the MBED.  To flash the binary file, copy it to /media/pi/MBED.  The two python scripts are to be run on the Pi and a spare PC, not connected to the Pi.  Make sure the project paths and Pi IP address is updated in the python scripts.
 
 ## Usage
 
