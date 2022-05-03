@@ -128,7 +128,7 @@ Robot Motor and Encoder
 ## Videos
 
 [![5d426e33601fc5a9d46645a86f8db33](https://user-images.githubusercontent.com/64867842/166330112-a8ef231e-3e2b-4b0d-a220-d8afc62608e4.png)](https://www.youtube.com/watch?v=H9ovxw3yx7E&ab_channel=ZouSicheng)  
-Automatic Mapping Demo  
+Autonomous Mapping Demo  
 
 [![0ea3cb7534f60492225665e88f2c3e7](https://user-images.githubusercontent.com/64867842/166330598-6b51ec51-b8f4-447f-ba78-00ca33d45f72.png)](https://www.youtube.com/watch?v=4T7IN5BH2GQ&ab_channel=ZouSicheng)  
 Remote Control Mapping Demo
