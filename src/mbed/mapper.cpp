@@ -89,6 +89,51 @@ int Mapper::read_dist(LIDAR_DIRECTION dir, uint32_t &d) {
     return status;
 }
 
+void Mapper::print_cal(Serial &out) {
+    std::map<float, int32_t>::iterator itr;
+    out.printf("Left samples:\r\n");
+    for (itr = _pwm_speed_map_l.begin(); itr != _pwm_speed_map_l.end(); ++itr) {
+        out.printf("_pwm_speed_map_l.insert(std::pair<float, int32_t>(%.1f, %d));\r\n", itr->first, itr->second);
+    }
+    out.printf("Right samples:\r\n");
+    for (itr = _pwm_speed_map_r.begin(); itr != _pwm_speed_map_r.end(); ++itr) {
+        out.printf("_pwm_speed_map_r.insert(std::pair<float, int32_t>(%.1f, %d));\r\n", itr->first, itr->second);
+    }
+    out.printf("\r\nLEFT:\r\n");
+    out.printf("\t%f (mm/s) / V\r\n", _pwm_speed_m_l);
+    out.printf("\t%f mm/s at 0 V\r\n", _pwm_speed_b_l);
+    out.printf("RIGHT:\r\n");
+    out.printf("\t%f (mm/s) / v\r\n", _pwm_speed_m_r);
+    out.printf("\t%f mm/s at 0 V\r\n\r\n", _pwm_speed_b_r);
+}
+
+void Mapper::default_cal() {
+    // Left samples:
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.1, 17));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.2, 58));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.3, 40));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.4, 78));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.5, 145));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.6, 188));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.7, 290));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.8, 337));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(0.9, 388));
+    _pwm_speed_map_l.insert(std::pair<float, int32_t>(1.0, 403));
+    // Right samples:
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.3, 40));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.4, 183));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.5, 68));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.6, 211));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.7, 280));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.8, 295));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(0.9, 298));
+    _pwm_speed_map_r.insert(std::pair<float, int32_t>(1.0, 308));
+
+    // This is the dictionary-like data structure "map", not plotted points
+    linearize_map(_pwm_speed_map_l, &_pwm_speed_m_l, &_pwm_speed_b_l);
+    linearize_map(_pwm_speed_map_r, &_pwm_speed_m_r, &_pwm_speed_b_r);
+}
+
 // Spin robot around, mapping PWM values to
 // wheel velocities on the current surface,
 // use linear regression to find line of best
@@ -127,10 +172,12 @@ void Mapper::calibrate_left_wheel() {
             _pwm_speed_map_l.insert(std::pair<float, int32_t>(pwm_val, av_vel));
         }
     }
+    // This is the dictionary-like data structure "map", not plotted points
     linearize_map(_pwm_speed_map_l, &_pwm_speed_m_l, &_pwm_speed_b_l);
 }
 
 void Mapper::calibrate_right_wheel() {
+    // See left wheel cal
     float pwm_val;
     int32_t av_vel;
     int samples = 5;
@@ -140,10 +187,6 @@ void Mapper::calibrate_right_wheel() {
         _wheel_r.speed(i * 0.1);
         wait(0.01);
     }
-    // Slow down by 0.1 pwm increments, waiting
-    // for speed to be constant, sample speed
-    // and get average speed to insert into the
-    // pwm to speed mappings.
     for (int i = 10; i >= 0; i--) {
         pwm_val = i * 0.1;
         _wheel_r.speed(pwm_val);
@@ -158,7 +201,6 @@ void Mapper::calibrate_right_wheel() {
             wait(0.1);
         }
         av_vel = av_vel / samples;
-        // Only add the value if it maintains movement
         if (av_vel > 5) {
             _pwm_speed_map_r.insert(std::pair<float, int32_t>(pwm_val, av_vel));
         }
@@ -312,15 +354,15 @@ void Mapper::_init_lidar() {
     int status;
     status = _lidars.center->init_sensor(0x01);
     if (status != 0) {
-        // error("FAILED TO INITIALIZE CENTER LIDAR\r\n");
+        error("FAILED TO INITIALIZE CENTER LIDAR\r\n");
     }
     status = _lidars.left->init_sensor(0x03);
     if (status != 0) {
-        // error("FAILED TO INITIALIZE LEFT LIDAR\r\n");
+        error("FAILED TO INITIALIZE LEFT LIDAR\r\n");
     }
     status = _lidars.right->init_sensor(0x05);
     if (status != 0) {
-        // error("FAILED TO INITIALIZE RIGHT LIDAR\r\n");
+        error("FAILED TO INITIALIZE RIGHT LIDAR\r\n");
     }
 }
 
