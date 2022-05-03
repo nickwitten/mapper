@@ -46,23 +46,7 @@ PROJECT := mbed
 ###############################################################################
 # Objects and Paths
 
-OBJECTS += 4DGL-uLCD-SE/uLCD_4DGL_Graphics.o
-OBJECTS += 4DGL-uLCD-SE/uLCD_4DGL_Media.o
-OBJECTS += 4DGL-uLCD-SE/uLCD_4DGL_Text.o
-OBJECTS += 4DGL-uLCD-SE/uLCD_4DGL_main.o
 OBJECTS += Motor/Motor.o
-OBJECTS += RPCInterface/SerialRPCInterface.o
-OBJECTS += RPCInterface/mbed-rpc/Arguments.o
-OBJECTS += RPCInterface/mbed-rpc/RPCFunction.o
-OBJECTS += RPCInterface/mbed-rpc/parse_pins.o
-OBJECTS += RPCInterface/mbed-rpc/rpc.o
-OBJECTS += SDFileSystem/FATFileSystem/ChaN/ccsbcs.o
-OBJECTS += SDFileSystem/FATFileSystem/ChaN/diskio.o
-OBJECTS += SDFileSystem/FATFileSystem/ChaN/ff.o
-OBJECTS += SDFileSystem/FATFileSystem/FATDirHandle.o
-OBJECTS += SDFileSystem/FATFileSystem/FATFileHandle.o
-OBJECTS += SDFileSystem/FATFileSystem/FATFileSystem.o
-OBJECTS += SDFileSystem/SDFileSystem.o
 OBJECTS += main.o
 OBJECTS += mapper.o
 OBJECTS += mbed-rtos/rtos/Mutex.o
@@ -88,11 +72,9 @@ OBJECTS += mbed-rtos/rtx/TARGET_CORTEX_M/rt_System.o
 OBJECTS += mbed-rtos/rtx/TARGET_CORTEX_M/rt_Task.o
 OBJECTS += mbed-rtos/rtx/TARGET_CORTEX_M/rt_Time.o
 OBJECTS += mbed-rtos/rtx/TARGET_CORTEX_M/rt_Timer.o
-OBJECTS += wave_player/wave_player.o
+OBJECTS += HALLFX_ENCODER/HALLFX_ENCODER.o
+OBJECTS += PID/PID.o
 OBJECTS += X_NUCLEO_53L0A1/Components/VL53L0X/VL53L0X.o
-OBJECTS += X_NUCLEO_53L0A1/XNucleo53L0A1.o
-OBJECTS += HALLFX_ENCODER.o
-OBJECTS += PID.o
 
 
  SYS_OBJECTS += mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM/cmsis_nvic.o
@@ -104,14 +86,7 @@ OBJECTS += PID.o
 INCLUDE_PATHS += -I../
 INCLUDE_PATHS += -I../.
 INCLUDE_PATHS += -I..//usr/src/mbed-sdk
-INCLUDE_PATHS += -I../4DGL-uLCD-SE
 INCLUDE_PATHS += -I../Motor
-INCLUDE_PATHS += -I../PinDetect
-INCLUDE_PATHS += -I../RPCInterface
-INCLUDE_PATHS += -I../RPCInterface/mbed-rpc
-INCLUDE_PATHS += -I../SDFileSystem
-INCLUDE_PATHS += -I../SDFileSystem/FATFileSystem
-INCLUDE_PATHS += -I../SDFileSystem/FATFileSystem/ChaN
 INCLUDE_PATHS += -I../mbed
 INCLUDE_PATHS += -I../mbed-rtos
 INCLUDE_PATHS += -I../mbed-rtos/rtos
@@ -119,21 +94,17 @@ INCLUDE_PATHS += -I../mbed-rtos/rtx/TARGET_CORTEX_M
 INCLUDE_PATHS += -I../mbed/TARGET_LPC1768
 INCLUDE_PATHS += -I../mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X
 INCLUDE_PATHS += -I../mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC1768
-INCLUDE_PATHS += -I../wave_player
+INCLUDE_PATHS += -I../HALLFX_ENCODER
+INCLUDE_PATHS += -I../PID
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/Components
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/Components/Display
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/Components/STMPE1600
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/Components/VL53L0X
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/ST_INTERFACES
-INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/ST_INTERFACES/Actuators
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/ST_INTERFACES/Common
-INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/ST_INTERFACES/Communications
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/ST_INTERFACES/Sensors
-INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/X_NUCLEO_COMMON
-INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/X_NUCLEO_COMMON/DbgMCU
 INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/X_NUCLEO_COMMON/DevI2C
-INCLUDE_PATHS += -I../X_NUCLEO_53L0A1/X_NUCLEO_COMMON/DevSPI
 
 
 LIBRARY_PATHS := -L../mbed/TARGET_LPC1768/TOOLCHAIN_GCC_ARM 
@@ -326,12 +297,7 @@ ASM_FLAGS += -DARM_MATH_CM3
 ASM_FLAGS += -D__CMSIS_RTOS
 ASM_FLAGS += -D__MBED_CMSIS_RTOS_CM
 ASM_FLAGS += -I/usr/src/mbed-sdk
-ASM_FLAGS += -I../4DGL-uLCD-SE
 ASM_FLAGS += -I../Motor
-ASM_FLAGS += -I../PinDetect
-ASM_FLAGS += -I../SDFileSystem
-ASM_FLAGS += -I../SDFileSystem/FATFileSystem
-ASM_FLAGS += -I../SDFileSystem/FATFileSystem/ChaN
 ASM_FLAGS += -I../mbed
 ASM_FLAGS += -I../mbed-rtos
 ASM_FLAGS += -I../mbed-rtos/rtos
@@ -339,7 +305,6 @@ ASM_FLAGS += -I../mbed-rtos/rtx/TARGET_CORTEX_M
 ASM_FLAGS += -I../mbed/TARGET_LPC1768
 ASM_FLAGS += -I../mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X
 ASM_FLAGS += -I../mbed/TARGET_LPC1768/TARGET_NXP/TARGET_LPC176X/TARGET_MBED_LPC1768
-ASM_FLAGS += -I../wave_player
 
 
 ASM_FLAGS += -c
