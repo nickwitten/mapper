@@ -27,7 +27,7 @@ To control the robot, open the serial port to the MBED from the Pi.  This can be
     pip install pyserial
     python -m serial.tools.miniterm /media/pi/MBED 9600
 
-The following commands can be issued over the serial port
+The following commands can be issued over the serial port:
 
     Arrow Up:    Speed Up
     Arrow Downs: Slow Down
@@ -37,9 +37,19 @@ The following commands can be issued over the serial port
     a:           Toggle Autonomous Mode
     Enter:       Print Mapper State
     
+   | Key  | Action |
+   | :---: | :---: |
+   | Arrow Up    | Speed Up |
+   | Arrow Down  | Slow Down (Backup) |
+   | Arrow Left  | Turn Counterclockwise 90 Degrees |
+   | Arrow Right | Turn Clockwise 90 Degrees |
+   | r           | Reset State and Map |
+   | a           | Toggle Autonomous Mode |
+   | Enter       | Print Mapper State |
+    
 The two python scripts can be used to enable plotting.  pi_saver.py should be run on the Pi and pc_plotter.py should be run on a PC.  Commands
 can still be issued while running the pi_saver.py script, but they should typed into the script STDIN and enter must be issued after every
-keypress so they can be passed through to the MBED.  Make sure the Pi's IP address is updated in the pc_plotter.py script.
+keypress so they can be passed through to the MBED.  Make sure the project paths and Pi IP address is updated in the python scripts.
 
 ## Part List:
 
@@ -51,6 +61,7 @@ keypress so they can be passed through to the MBED.  Make sure the Pi's IP addre
    [3x VL53L0X ToF Sensor](https://www.adafruit.com/product/3317)  
    [2x Wheel Encoder Kit ](https://www.sparkfun.com/products/12629)  
    [5V Battery Pack](https://www.sparkfun.com/products/9835)  
+   [USB Portable Charger](https://us.anker.com/products/a1215)  
    [DC Barrel Jack Adapter](https://www.sparkfun.com/products/10811)  
    [Raspberry Pi Zero W](https://www.sparkfun.com/products/14277)  
     
