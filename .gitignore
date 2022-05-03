@@ -1,3 +1,4 @@
-src/BUILD/
-src/.session.vim
-src/tags
+src/mbed/.session.vim
+src/mbed/tags
+src/mbed/BUILD
+
