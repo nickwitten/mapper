@@ -20,7 +20,7 @@ The shadow bot chassis is used as the frame of the robot; 2 DC motors with a dua
 ![image](https://user-images.githubusercontent.com/59176907/166589332-684a14d0-5920-4d25-ae13-304ae478fbdf.png)
 
 ## Software Systems
-![flow_chart_mapper](https://user-images.githubusercontent.com/64867842/166290131-8ed56b9a-3980-4f2d-981d-875d3332afb2.jpg)
+![flow_chart_mapper](https://user-images.githubusercontent.com/64867842/166290131-8ed56b9a-3980-4f2d-981d-875d3332afb2.jpg)  
 Controller State Diagram  
 
 ![Automonus_Mode_Flow_Chart](https://user-images.githubusercontent.com/64867842/166316527-de09a802-df6c-48b6-8c22-c4eb831cb8b8.jpg)  
