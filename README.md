@@ -28,14 +28,6 @@ To control the robot, open the serial port to the MBED from the Pi.  This can be
     python -m serial.tools.miniterm /media/pi/MBED 9600
 
 The following commands can be issued over the serial port:
-
-    Arrow Up:    Speed Up
-    Arrow Downs: Slow Down
-    Arrow Left:  Turn Counterclockwise 90 Degrees
-    Arrow Right: Turn Clockwise 90 Degrees
-    r:           Reset State and Map
-    a:           Toggle Autonomous Mode
-    Enter:       Print Mapper State
     
    | Key  | Action |
    | :---: | :---: |
