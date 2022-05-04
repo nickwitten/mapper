@@ -38,7 +38,7 @@ The virtual COM port is used to control the Mapper through the Raspberry Pi.  Ma
 To control the robot, open the serial port to the MBED from the Pi.  This can be done with the following commands:
 
     pip install pyserial
-    python -m serial.tools.miniterm /media/pi/MBED 9600
+    python -m serial.tools.miniterm /dev/ttyACM0 9600
 
 The following commands can be issued over the serial port:
     
