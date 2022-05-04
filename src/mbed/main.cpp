@@ -128,6 +128,7 @@ void toggle_automation() {
 }
 
 void dispatch() {
+    while (!pi_mutex.trylock()) Thread::yield();
     while (pi.readable()) {
         char IN = pi.getc();
         switch (IN) {
@@ -165,14 +166,14 @@ void dispatch() {
                 break;
         }
     }
+    pi_mutex.unlock();
 }
 
 int main() {
-    robot.start_state_update(0.05);
     robot.control = false;
+    robot.start_state_update(0.05);
     if (HEADLESS) {
         robot.default_cal();
-        auto_t.start(Callback<void()>(&autonomous));
     } else {
         while (pi.readable()) pi.getc();
         pi.printf("Calibrate? [y,n]\r\n");
@@ -190,9 +191,13 @@ int main() {
             robot.default_cal();
         }
     }
-    robot.control = true;
     robot.init_state();  // Restart robot state
     restart_map();  // Restart plotting map
+    robot.control = true;
+
+    if (HEADLESS) {
+        auto_t.start(Callback<void()>(&autonomous));
+    }
 
     while (1) {
         dispatch();
