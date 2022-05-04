@@ -169,6 +169,7 @@ void dispatch() {
 
 int main() {
     robot.start_state_update(0.05);
+    robot.control = false;
     if (HEADLESS) {
         robot.default_cal();
         auto_t.start(Callback<void()>(&autonomous));
@@ -176,7 +177,6 @@ int main() {
         while (pi.readable()) pi.getc();
         pi.printf("Calibrate? [y,n]\r\n");
         if (pi.getc() == 'y') {
-            robot.control = false;
             pi.printf("Press any key to calibrate the left wheel\r\n");
             pi.getc();
             robot.calibrate_left_wheel();
@@ -186,11 +186,11 @@ int main() {
             pi.getc();
             robot.calibrate_right_wheel();
             robot.print_cal(pi);
-            robot.control = true;
         } else {
             robot.default_cal();
         }
     }
+    robot.control = true;
     robot.init_state();  // Restart robot state
     restart_map();  // Restart plotting map
 
