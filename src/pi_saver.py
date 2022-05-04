@@ -18,8 +18,11 @@ def passthrough():
         mbed_out.flush()
 
 if __name__ == '__main__':
-    t = threading.Thread(target=passthrough)
-    t.start()
+    if False:
+        # Passthrough was causing some issues with opening the serial port
+        # although it did work in the past.  Turned off for now.
+        t = threading.Thread(target=passthrough)
+        t.start()
     while True:
         try:
             new_lines = mbed.readlines()
