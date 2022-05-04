@@ -1,5 +1,8 @@
 # 2D Mapping Robot
 
+![image](https://user-images.githubusercontent.com/59176907/166605907-93b266ab-1fa6-4b01-ad0f-eecf105977df.png)  
+
+
 This is a final team-based project for Georgia Tech's ECE 4180 Embedded System Design Course.
 
 ## Team Members
