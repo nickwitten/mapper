@@ -168,10 +168,9 @@ void dispatch() {
 }
 
 int main() {
+    robot.start_state_update(0.05);
     if (HEADLESS) {
-        restart_map();  // Restart plotting map
         robot.default_cal();
-        robot.start_state_update(0.05);
         auto_t.start(Callback<void()>(&autonomous));
     } else {
         while (pi.readable()) pi.getc();
@@ -191,9 +190,9 @@ int main() {
         } else {
             robot.default_cal();
         }
-        restart_map();  // Restart plotting map
-        robot.start_state_update(0.05);
     }
+    robot.init_state();  // Restart robot state
+    restart_map();  // Restart plotting map
 
     while (1) {
         dispatch();
